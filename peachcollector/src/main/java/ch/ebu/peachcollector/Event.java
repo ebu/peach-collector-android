@@ -1,4 +1,4 @@
-package ch.ebu.peachcollector.database;
+package ch.ebu.peachcollector;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -7,20 +7,10 @@ import androidx.room.Entity;
 import androidx.room.Index;
 import androidx.room.PrimaryKey;
 
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
-import java.util.Calendar;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.TimeZone;
-
-import ch.ebu.peachcollector.Constant;
-import ch.ebu.peachcollector.EventContext;
-import ch.ebu.peachcollector.EventContextComponent;
-import ch.ebu.peachcollector.EventProperties;
-import ch.ebu.peachcollector.PeachCollector;
 
 import static ch.ebu.peachcollector.Constant.*;
 

@@ -2,7 +2,6 @@ package ch.ebu.peachcollector;
 
 import android.content.Context;
 import android.content.Intent;
-import android.os.AsyncTask;
 import android.os.Handler;
 import android.os.HandlerThread;
 import android.os.Message;
@@ -16,10 +15,6 @@ import java.util.Timer;
 import java.util.TimerTask;
 import java.util.concurrent.Executor;
 import java.util.concurrent.Executors;
-
-import ch.ebu.peachcollector.database.Event;
-import ch.ebu.peachcollector.database.EventStatus;
-import ch.ebu.peachcollector.database.RoomDatabase;
 
 import static java.lang.Math.min;
 

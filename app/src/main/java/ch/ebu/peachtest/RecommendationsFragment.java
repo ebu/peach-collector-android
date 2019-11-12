@@ -15,7 +15,7 @@ import android.widget.ImageButton;
 import java.util.ArrayList;
 
 import ch.ebu.peachcollector.EventContextComponent;
-import ch.ebu.peachcollector.database.Event;
+import ch.ebu.peachcollector.Event;
 
 
 public class RecommendationsFragment extends Fragment {

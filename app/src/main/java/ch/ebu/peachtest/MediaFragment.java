@@ -16,7 +16,7 @@ import android.widget.MediaController;
 import android.widget.VideoView;
 
 import ch.ebu.peachcollector.EventContextComponent;
-import ch.ebu.peachcollector.database.Event;
+import ch.ebu.peachcollector.Event;
 
 
 /**

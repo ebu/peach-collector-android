@@ -1,10 +1,8 @@
-package ch.ebu.peachcollector.database;
+package ch.ebu.peachcollector;
 
 import androidx.room.*;
 
 import java.util.List;
-
-import ch.ebu.peachcollector.Constant;
 
 @Dao
 public interface EventDao {

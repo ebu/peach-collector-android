@@ -6,22 +6,20 @@ import android.app.PendingIntent;
 import android.app.Service;
 import android.content.Context;
 import android.content.Intent;
-import android.graphics.Color;
 import android.media.AudioManager;
 import android.media.MediaPlayer;
 import android.media.Rating;
 import android.media.session.MediaController;
 import android.media.session.MediaSession;
 import android.media.session.MediaSessionManager;
+import android.os.Binder;
 import android.os.IBinder;
 import android.util.Log;
-
-import androidx.core.app.NotificationCompat;
 
 import java.io.IOException;
 
 import ch.ebu.peachcollector.EventProperties;
-import ch.ebu.peachcollector.database.Event;
+import ch.ebu.peachcollector.Event;
 
 /**
  * Created by paulruiz on 10/28/14.

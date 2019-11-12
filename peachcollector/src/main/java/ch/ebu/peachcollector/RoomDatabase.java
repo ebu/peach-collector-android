@@ -1,15 +1,12 @@
-package ch.ebu.peachcollector.database;
+package ch.ebu.peachcollector;
 
 import android.content.Context;
-import android.os.AsyncTask;
 
 import androidx.annotation.NonNull;
 import androidx.room.Database;
 import androidx.room.Room;
 import androidx.room.TypeConverters;
 import androidx.sqlite.db.SupportSQLiteDatabase;
-
-import java.util.Date;
 
 @Database(entities = {Event.class, EventStatus.class}, version = 1, exportSchema = false)
 @TypeConverters({DateConverter.class, StringMapConverter.class})
@@ -22,11 +19,11 @@ public abstract class RoomDatabase extends androidx.room.RoomDatabase {
         if (INSTANCE == null) {
             synchronized (RoomDatabase.class) {
                 if (INSTANCE == null) {
-                    INSTANCE = Room.databaseBuilder(context.getApplicationContext(),
+                    androidx.room.RoomDatabase.Builder<RoomDatabase> builder = Room.databaseBuilder(context.getApplicationContext(),
                             RoomDatabase.class, "peach_collector_database")
-                            .addCallback(sRoomDatabaseCallback)
-                            .allowMainThreadQueries()
-                            .build();
+                            .addCallback(sRoomDatabaseCallback);
+                    if (PeachCollector.isUnitTesting) builder.allowMainThreadQueries();
+                    INSTANCE = builder.build();
                 }
             }
         }

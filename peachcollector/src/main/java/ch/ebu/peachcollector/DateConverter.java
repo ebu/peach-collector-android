@@ -1,4 +1,4 @@
-package ch.ebu.peachcollector.database;
+package ch.ebu.peachcollector;
 
 import androidx.room.TypeConverter;
 

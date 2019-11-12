@@ -11,21 +11,15 @@ import android.content.IntentFilter;
 import android.os.Bundle;
 import android.text.method.ScrollingMovementMethod;
 import android.util.AttributeSet;
-import android.util.Log;
 import android.view.View;
-import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import java.util.List;
 
-import ch.ebu.peachcollector.Constant;
 import ch.ebu.peachcollector.PeachCollector;
 import ch.ebu.peachcollector.Publisher;
-import ch.ebu.peachcollector.database.Event;
-import ch.ebu.peachcollector.database.EventDao;
-import ch.ebu.peachcollector.database.EventStatus;
-
-import static android.os.SystemClock.sleep;
+import ch.ebu.peachcollector.Event;
+import ch.ebu.peachcollector.EventStatus;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -81,8 +75,8 @@ public class MainActivity extends AppCompatActivity {
         publisher2Config = findViewById(R.id.publisher2_config);
         publisher2Count = findViewById(R.id.publisher2_count);
 
-        PeachCollector.init(getApplicationContext());
         PeachCollector.isUnitTesting = true;
+        PeachCollector.init(getApplicationContext());
 
         Publisher publisher = new Publisher("zzebu00000000017");
         PeachCollector.addPublisher(publisher, DEFAULT_PUBLISHER);

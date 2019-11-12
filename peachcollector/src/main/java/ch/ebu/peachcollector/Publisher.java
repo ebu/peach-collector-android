@@ -1,6 +1,5 @@
 package ch.ebu.peachcollector;
 
-import android.app.Activity;
 import android.content.Context;
 import android.content.pm.ApplicationInfo;
 import android.content.pm.PackageInfo;
@@ -9,7 +8,6 @@ import android.content.res.Configuration;
 import android.os.AsyncTask;
 import android.os.Handler;
 import android.util.DisplayMetrics;
-import android.util.JsonWriter;
 import android.view.WindowManager;
 
 import org.json.JSONObject;
@@ -29,8 +27,6 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.TimeZone;
-
-import ch.ebu.peachcollector.database.Event;
 
 import static ch.ebu.peachcollector.Constant.*;
 
