@@ -36,7 +36,7 @@ public class MediaPlayerService extends Service implements MediaPlayer.OnComplet
     public static final String ACTION_PREVIOUS = "action_previous";
     public static final String ACTION_STOP = "action_stop";
 
-
+    private final IBinder iBinder = new LocalBinder();
     private MediaSessionManager mManager;
     private MediaSession mSession;
     private MediaController mController;
@@ -45,13 +45,22 @@ public class MediaPlayerService extends Service implements MediaPlayer.OnComplet
     private String mediaFile;
     private int resumePosition;
 
+    private boolean playing, stopped, paused;
 
     private EventProperties properties;
 
 
+    public class LocalBinder extends Binder
+    {
+        public MediaPlayerService getService()
+        {
+            return MediaPlayerService.this;
+        }
+    }
+
     @Override
     public IBinder onBind(Intent intent) {
-        return null;
+        return iBinder;
     }
 
     private void handleIntent( Intent intent ) {
@@ -165,34 +174,66 @@ public class MediaPlayerService extends Service implements MediaPlayer.OnComplet
         mediaPlayer.prepareAsync();
     }
 
-    private void playMedia() {
+    public void playMedia() {
         if (!mediaPlayer.isPlaying()) {
+            buildNotification( generateAction( android.R.drawable.ic_media_pause, "Pause", ACTION_PAUSE ) );
             mediaPlayer.start();
             Event.sendMediaPlay("media00",null,null,null);
+            playing = true;
+            paused = false;
+            stopped = false;
         }
     }
 
-    private void stopMedia() {
+    public void stopMedia() {
         if (mediaPlayer == null) return;
         if (mediaPlayer.isPlaying()) {
             mediaPlayer.stop();
+            playing = false;
+            paused = false;
+            stopped = true;
         }
     }
 
-    private void pauseMedia() {
+    public void pauseMedia() {
         if (mediaPlayer.isPlaying()) {
+            buildNotification(generateAction(android.R.drawable.ic_media_play, "Play", ACTION_PLAY));
             mediaPlayer.pause();
             Event.sendMediaPause("media00",null,null,null);
             resumePosition = mediaPlayer.getCurrentPosition();
+            playing = false;
+            paused = true;
+            stopped = false;
         }
     }
 
-    private void resumeMedia() {
+    public void resumeMedia() {
         if (!mediaPlayer.isPlaying()) {
+            buildNotification( generateAction( android.R.drawable.ic_media_pause, "Pause", ACTION_PAUSE ) );
             Event.sendMediaPlay("media00",null,null,null);
             mediaPlayer.seekTo(resumePosition);
             mediaPlayer.start();
+            playing = true;
+            paused = false;
+            stopped = false;
         }
+    }
+
+    public boolean isPlaying()
+    {
+        return playing;
+    }
+
+
+    public boolean isPaused()
+    {
+        return paused;
+    }
+
+
+    public boolean isStopped()
+    {
+        return stopped;
     }
 
 
@@ -207,16 +248,12 @@ public class MediaPlayerService extends Service implements MediaPlayer.OnComplet
                                  public void onPlay() {
                                      super.onPlay();
                                      resumeMedia();
-                                     Log.e( "MediaPlayerService", "onPlay");
-                                     buildNotification( generateAction( android.R.drawable.ic_media_pause, "Pause", ACTION_PAUSE ) );
                                  }
 
                                  @Override
                                  public void onPause() {
                                      super.onPause();
                                      pauseMedia();
-                                     Log.e( "MediaPlayerService", "onPause");
-                                     buildNotification(generateAction(android.R.drawable.ic_media_play, "Play", ACTION_PLAY));
                                  }
 
                                  @Override

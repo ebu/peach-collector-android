@@ -58,21 +58,14 @@ public class AudioFragment extends Fragment {
         playerButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-
-                playAudio("https://upload.wikimedia.org/wikipedia/commons/6/6c/Grieg_Lyric_Pieces_Kobold.ogg");
-
-
-
-                /*if (videoView.isPlaying()) {
-                    videoView.pause();
+                if (player != null && player.isPlaying()) {
+                    player.pauseMedia();
                     playerButton.setImageResource(R.drawable.icon_play);
-                    Event.sendMediaPause("media00", null, null, null);
                 }
                 else {
-                    videoView.start();
+                    playAudio("https://upload.wikimedia.org/wikipedia/commons/6/6c/Grieg_Lyric_Pieces_Kobold.ogg");
                     playerButton.setImageResource(R.drawable.icon_pause);
-                    Event.sendMediaPlay("media00", null, null, null);
-                }*/
+                }
             }
         });
 
@@ -85,15 +78,15 @@ public class AudioFragment extends Fragment {
             Intent playerIntent = new Intent(getContext(), MediaPlayerService.class);
             playerIntent.putExtra("media", media);
             getContext().startService(playerIntent);
-           // getContext().bindService(playerIntent, serviceConnection, Context.BIND_AUTO_CREATE);
+            getContext().bindService(playerIntent, serviceConnection, Context.BIND_AUTO_CREATE);
         } else {
             //Service is active
-            //Send media with BroadcastReceiver
+            player.resumeMedia();
         }
     }
 
 
-    /*//Binding this Client to the AudioPlayer Service
+    //Binding this Client to the AudioPlayer Service
     private ServiceConnection serviceConnection = new ServiceConnection() {
         @Override
         public void onServiceConnected(ComponentName name, IBinder service) {
@@ -102,13 +95,18 @@ public class AudioFragment extends Fragment {
             player = binder.getService();
             serviceBound = true;
 
-            Toast.makeText(getContext(), "Service Bound", Toast.LENGTH_SHORT).show();
+            if (player != null && player.isPlaying()) {
+                playerButton.setImageResource(R.drawable.icon_play);
+            }
+            else {
+                playerButton.setImageResource(R.drawable.icon_pause);
+            }
         }
 
         @Override
         public void onServiceDisconnected(ComponentName name) {
             serviceBound = false;
         }
-    };*/
+    };
 
 }
