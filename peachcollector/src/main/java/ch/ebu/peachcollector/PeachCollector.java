@@ -43,9 +43,7 @@ public class PeachCollector {
                     INSTANCE.publisherFailures = new HashMap<>();
                     INSTANCE.dbExecutor = Executors.newSingleThreadExecutor();
                     INSTANCE.handlerThread = new HandlerThread("SomeNameHere");
-                    INSTANCE.handlerThread.start();
-                    //should call quit() onDestroy of activity ? INSTANCE.handlerThread.quit()
-                    //INSTANCE.initializeCollector();
+                    INSTANCE.handlerThread.start(); //should call quit() onDestroy of activity ? INSTANCE.handlerThread.quit()
                 }
             }
         }
@@ -57,8 +55,7 @@ public class PeachCollector {
     }
 
 
-    public static void sendEvent(final Event event){
-
+    public static void sendEvent(final Event event) {
         INSTANCE.dbExecutor.execute(new Runnable() {
             @Override
             public void run() {
@@ -87,9 +84,11 @@ public class PeachCollector {
 
     public static void addPublisher(Publisher publisher, String publisherName) {
         INSTANCE.publishers.put(publisherName, publisher);
+        // send events in the database that are queued for this publisher
+        INSTANCE.sendEventsToPublisher(publisherName);
     }
 
-    public static void clean(){
+    public static void clean() {
         INSTANCE.cleanTimers();
         INSTANCE.dbExecutor.execute(new Runnable() {
             @Override
@@ -97,6 +96,12 @@ public class PeachCollector {
                 INSTANCE.database.peachCollectorEventDao().deleteAll();
             }
         });
+    }
+
+    public static void flush() {
+        for (String publisherName :INSTANCE.publishers.keySet()) {
+            INSTANCE.sendEventsToPublisher(publisherName);
+        }
     }
 
     private void checkPublishers() {
@@ -267,13 +272,6 @@ public class PeachCollector {
         }
 
         return publisher.interval;
-    }
-
-    public static void flush()
-    {
-        for (String publisherName :INSTANCE.publishers.keySet()) {
-            INSTANCE.sendEventsToPublisher(publisherName);
-        }
     }
 
 }
