@@ -1,7 +1,7 @@
 apply plugin: 'com.android.library'
+apply plugin: 'com.github.dcendents.android-maven'
 
-def artifactId = 'peachcollector'
-def groupId = 'ch.ebu.peachcollector'
+def groupId = 'com.github.ebu'
 
 android {
     compileSdkVersion 29
@@ -12,7 +12,7 @@ android {
         minSdkVersion 21
         targetSdkVersion 29
         versionCode 1
-        versionName "1.0"
+        versionName "0.1"
 
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
         consumerProguardFiles 'consumer-rules.pro'
@@ -38,7 +38,7 @@ dependencies {
     implementation 'com.google.code.gson:gson:2.8.6'
 
     // Room components
-    implementation "androidx.room:room-runtime:$rootProject.roomVersion"
-    annotationProcessor "androidx.room:room-compiler:$rootProject.roomVersion"
-    androidTestImplementation "androidx.room:room-testing:$rootProject.roomVersion"
+    implementation "androidx.room:room-runtime:2.2.1"
+    annotationProcessor "androidx.room:room-compiler:2.2.1"
+    androidTestImplementation "androidx.room:room-testing:2.2.1"
 }
