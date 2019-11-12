@@ -1,2 +1,2 @@
 include ':app', ':peachcollector'
-rootProject.name='PeachTest'
+rootProject.name='PeachDemo'

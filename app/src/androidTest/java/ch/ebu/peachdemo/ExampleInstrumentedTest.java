@@ -1,4 +1,4 @@
-package ch.ebu.peachtest;
+package ch.ebu.peachdemo;
 
 import android.content.Context;
 
@@ -22,6 +22,6 @@ public class ExampleInstrumentedTest {
         // Context of the app under test.
         Context appContext = InstrumentationRegistry.getInstrumentation().getTargetContext();
 
-        assertEquals("ch.ebu.peachtest", appContext.getPackageName());
+        assertEquals("ch.ebu.peachmedo", appContext.getPackageName());
     }
 }

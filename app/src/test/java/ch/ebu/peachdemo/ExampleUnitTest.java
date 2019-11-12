@@ -1,4 +1,4 @@
-package ch.ebu.peachtest;
+package ch.ebu.peachdemo;
 
 import org.junit.Test;
 

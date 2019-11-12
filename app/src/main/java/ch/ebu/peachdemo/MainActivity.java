@@ -1,4 +1,4 @@
-package ch.ebu.peachtest;
+package ch.ebu.peachdemo;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
