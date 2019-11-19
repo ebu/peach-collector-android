@@ -16,6 +16,7 @@ import java.util.TimerTask;
 import java.util.concurrent.Executor;
 import java.util.concurrent.Executors;
 
+import static ch.ebu.peachcollector.Constant.*;
 import static java.lang.Math.min;
 
 public class PeachCollector {
@@ -29,6 +30,7 @@ public class PeachCollector {
     private HandlerThread handlerThread;
     public static String implementationVersion;
     public static String userID;
+    public static String deviceID;
     public static boolean isUnitTesting = false;
 
     public static PeachCollector init(final Context context) {
@@ -42,7 +44,7 @@ public class PeachCollector {
                     INSTANCE.publisherTimers = new HashMap<>();
                     INSTANCE.publisherFailures = new HashMap<>();
                     INSTANCE.dbExecutor = Executors.newSingleThreadExecutor();
-                    INSTANCE.handlerThread = new HandlerThread("SomeNameHere");
+                    INSTANCE.handlerThread = new HandlerThread("PeachCollectorPostHandler");
                     INSTANCE.handlerThread.start(); //should call quit() onDestroy of activity ? INSTANCE.handlerThread.quit()
                 }
             }
@@ -72,8 +74,8 @@ public class PeachCollector {
 
                 if (PeachCollector.isUnitTesting) {
                     Intent intent = new Intent();
-                    intent.setAction("ch.ebu.testingLog");
-                    intent.putExtra("Log", "+ Event (" + event.getType() + ")");
+                    intent.setAction(PEACH_LOG_NOTIFICATION);
+                    intent.putExtra(PEACH_LOG_NOTIFICATION_MESSAGE, "+ Event (" + event.getType() + ")");
                     applicationContext.sendBroadcast(intent);
                 }
 
@@ -178,11 +180,12 @@ public class PeachCollector {
             public void run() {
                 List<EventStatus> statuses = database.peachCollectorEventDao().getStatuses(publisherName);
                 final ArrayList<Event> events = new ArrayList<>();
-                int pendingEventsCount = 0;
                 for (EventStatus status: statuses) {
-                    if (status.getStatus() == 1) return;
+                    if (status.getStatus() == 1) {
+                        // An event is in the process of being sent, stop this process
+                        return;
+                    }
                     if (status.getStatus() == 0) {
-                        pendingEventsCount ++;
                         if (events.size() < publisher.maxEventsPerBatchAfterOfflineSession) {
                             Event event = database.peachCollectorEventDao().getEvent(status.eventID);
                             events.add(event);
@@ -191,17 +194,19 @@ public class PeachCollector {
                         }
                     }
                 }
-                if (events.size() == 0) return;
+
+                if (events.size() == 0) {
+                    // There are no events to send, do nothing
+                    return;
+                }
 
                 cleanTimer(publisherName);
-
-                //final boolean shouldContinueSending = pendingEventsCount > events.size();
 
                 Handler handler = new Handler(handlerThread.getLooper(), new Handler.Callback() {
 
                     @Override
                     public boolean handleMessage(Message msg) {
-                        boolean sent = msg.obj == null;
+                        boolean sent = msg.what == 0;
 
                         List<EventStatus> statuses = database.peachCollectorEventDao().getStatuses(publisherName);
                         boolean shouldContinueSending = statuses.size() > events.size();
@@ -215,8 +220,7 @@ public class PeachCollector {
                             }
                         }
 
-                        if (msg.obj != null) {
-
+                        if (!sent) {
                             Integer numberOfFailures = publisherFailures.get(publisherName);
                             numberOfFailures = (numberOfFailures == null) ? 1 : numberOfFailures+1;
                             publisherFailures.put(publisherName, numberOfFailures);
@@ -225,8 +229,8 @@ public class PeachCollector {
 
                             if (PeachCollector.isUnitTesting) {
                                 Intent intent = new Intent();
-                                intent.setAction("ch.ebu.testingLog");
-                                intent.putExtra("Log", publisherName + " : Failed to publish events");
+                                intent.setAction(PEACH_LOG_NOTIFICATION);
+                                intent.putExtra(PEACH_LOG_NOTIFICATION_MESSAGE, publisherName + " : Failed to publish events");
                                 applicationContext.sendBroadcast(intent);
                             }
                         }
@@ -237,15 +241,14 @@ public class PeachCollector {
                             }
                             if (PeachCollector.isUnitTesting) {
                                 Intent intent = new Intent();
-                                intent.setAction("ch.ebu.testingLog");
-                                intent.putExtra("Log", publisherName + " : Published " + events.size() + " events");
+                                intent.setAction(PEACH_LOG_NOTIFICATION);
+                                intent.putExtra(PEACH_LOG_NOTIFICATION_MESSAGE, publisherName + " : Published " + events.size() + " events");
                                 applicationContext.sendBroadcast(intent);
                             }
                         }
                         return false;
                     }
                 });
-
 
                 publisher.processEvents(events, handler);
             }

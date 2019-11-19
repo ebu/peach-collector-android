@@ -16,10 +16,12 @@ import android.widget.TextView;
 
 import java.util.List;
 
+import ch.ebu.peachcollector.Event;
 import ch.ebu.peachcollector.PeachCollector;
 import ch.ebu.peachcollector.Publisher;
-import ch.ebu.peachcollector.Event;
 import ch.ebu.peachcollector.EventStatus;
+
+import static ch.ebu.peachcollector.Constant.*;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -44,7 +46,7 @@ public class MainActivity extends AppCompatActivity {
         @Override
         public void onReceive(Context context, Intent intent) {
             String previousText = logTextView.getText().toString();
-            String finalText = intent.getStringExtra("Log") + "\n" + previousText;
+            String finalText = intent.getStringExtra(PEACH_LOG_NOTIFICATION_MESSAGE) + "\n" + previousText;
             logTextView.setText(finalText);
 
             PeachCollector collector = PeachCollector.init(getApplicationContext());
@@ -89,9 +91,8 @@ public class MainActivity extends AppCompatActivity {
             }
         };
         publisher2.maxEventsPerBatch = 5;
+        publisher2.interval = 5;
         PeachCollector.addPublisher(publisher2, MEDIA_PUBLISHER);
-
-        //PeachCollector.clean();
 
         String publisher1ConfigText = "MaxEvents: " + publisher.maxEventsPerBatch + " / Interval: " + publisher.interval + "\nURL: http://peach.ebu.io/collect...";
         publisher1Config.setText(publisher1ConfigText);
@@ -102,10 +103,8 @@ public class MainActivity extends AppCompatActivity {
         publisher2Title.setText(MEDIA_PUBLISHER);
 
         IntentFilter filter = new IntentFilter();
-        filter.addAction("ch.ebu.testingLog");
+        filter.addAction(PEACH_LOG_NOTIFICATION);
         registerReceiver(receiver, filter);
-
-        //Event.sendPageView("page00", null, "reco0001");
 
         RecommendationsFragment recommendationsFragment = new RecommendationsFragment();
         getSupportFragmentManager().beginTransaction().replace(R.id.fragmentContainer, recommendationsFragment, "recommendationsFragment").addToBackStack("recommendationsFragment").commit();

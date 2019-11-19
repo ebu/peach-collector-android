@@ -2,7 +2,8 @@ package ch.ebu.peachcollector;
 
 public class Constant {
 
-
+    public static final String PEACH_LOG_NOTIFICATION = "ch.ebu.testingLog";
+    public static final String PEACH_LOG_NOTIFICATION_MESSAGE = "Message";
 
     public static final String PEACH_SCHEMA_VERSION_KEY = "peach_schema_version";
     public static final String PEACH_FRAMEWORK_VERSION_KEY = "peach_framework_version";

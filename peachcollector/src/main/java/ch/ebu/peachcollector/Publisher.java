@@ -7,6 +7,7 @@ import android.content.pm.PackageManager;
 import android.content.res.Configuration;
 import android.os.AsyncTask;
 import android.os.Handler;
+import android.os.Message;
 import android.util.DisplayMetrics;
 import android.view.WindowManager;
 
@@ -197,7 +198,7 @@ public class Publisher {
         @Override
         protected String doInBackground(String... params) {
             String data = params[0];
-
+            int responseCode = 0;
             try{
                 URL url = new URL(serviceURL);
                 HttpURLConnection httpURLConnection = (HttpURLConnection)url.openConnection();
@@ -208,30 +209,30 @@ public class Publisher {
                 writer.write(data);
                 writer.flush();
                 //get response code and check if valid (HTTP OK)
-                int responseCode = httpURLConnection.getResponseCode();
-                if(responseCode == 201){//if valid, read result from server
+                responseCode = httpURLConnection.getResponseCode();
+                if(responseCode != 201){
                     BufferedReader reader = new BufferedReader(new InputStreamReader(httpURLConnection.getInputStream()));
                     String line;
                     StringBuilder stringBuilder = new StringBuilder();
                     while((line = reader.readLine()) != null){
                         stringBuilder.append(line);
                     }
+                    stringBuilder.insert(0, "Error: ");
                     return stringBuilder.toString();
                 }
+                return null;
             } catch (MalformedURLException e) {
                 e.printStackTrace();
             } catch (IOException e) {
                 e.printStackTrace();
             }
-            return null;
+            return "Error " + responseCode;
         }
 
         @Override
         protected void onPostExecute(String result) {
-            // something...
             if (completionHandler != null) {
-                //Message msg = completionHandler.obtainMessage();
-                completionHandler.sendEmptyMessage(0);
+                completionHandler.sendEmptyMessage(result != null ? 1 : 0);
             }
         }
     }
