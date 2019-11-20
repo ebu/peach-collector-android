@@ -86,8 +86,23 @@ public class PeachCollector {
 
     public static void addPublisher(Publisher publisher, String publisherName) {
         INSTANCE.publishers.put(publisherName, publisher);
+        // in case of a crash while sending events, reset related events statuses
+        INSTANCE.resetPublisherStatuses(publisherName);
         // send events in the database that are queued for this publisher
         INSTANCE.sendEventsToPublisher(publisherName);
+    }
+
+    private void resetPublisherStatuses(final String publisherName){
+        dbExecutor.execute(new Runnable() {
+            @Override
+            public void run() {
+                List<EventStatus> statuses = database.peachCollectorEventDao().getStatuses(publisherName);
+                for (EventStatus status: statuses) {
+                    status.setStatus(0);
+                    database.peachCollectorEventDao().update(status);
+                }
+            }
+        });
     }
 
     public static void clean() {
