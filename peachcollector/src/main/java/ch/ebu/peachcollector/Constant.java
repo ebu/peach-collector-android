@@ -25,7 +25,7 @@ public class Constant {
 
     public static final String CONTEXT_ID_KEY = "id";
     public static final String CONTEXT_ITEMS_KEY = "items";
-    public static final String CONTEXT_ITEMS_DISPLAYED_KEY = "items_displayed";
+    public static final String CONTEXT_ITEM_ID_KEY = "item_id";
     public static final String CONTEXT_HIT_INDEX_KEY = "hit_index";
     public static final String CONTEXT_PAGE_URI_KEY = "page_uri";
     public static final String CONTEXT_SOURCE_KEY = "source";
