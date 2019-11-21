@@ -1,5 +1,6 @@
 package ch.ebu.peachcollector;
 
+import android.app.Application;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Handler;
@@ -22,6 +23,7 @@ import static java.lang.Math.min;
 public class PeachCollector {
     private static volatile PeachCollector INSTANCE;
     private static volatile Context applicationContext;
+    private static volatile Application application;
     public RoomDatabase database;
     public HashMap<String, Publisher> publishers;
     public HashMap<String, Timer> publisherTimers;
@@ -32,20 +34,23 @@ public class PeachCollector {
     public static String userID;
     public static String deviceID;
     public static boolean isUnitTesting = false;
+    private LifecycleHandler lifecycleHandler = new LifecycleHandler();
 
-    public static PeachCollector init(final Context context) {
-        applicationContext = context;
+    public static PeachCollector init(final Application app) {
+        application = app;
+        applicationContext = application.getApplicationContext();
         if (INSTANCE == null) {
             synchronized (RoomDatabase.class) {
                 if (INSTANCE == null) {
                     INSTANCE = new PeachCollector();
-                    INSTANCE.database = RoomDatabase.getDatabase(context);
+                    INSTANCE.database = RoomDatabase.getDatabase(applicationContext);
                     INSTANCE.publishers = new HashMap<>();
                     INSTANCE.publisherTimers = new HashMap<>();
                     INSTANCE.publisherFailures = new HashMap<>();
                     INSTANCE.dbExecutor = Executors.newSingleThreadExecutor();
                     INSTANCE.handlerThread = new HandlerThread("PeachCollectorPostHandler");
                     INSTANCE.handlerThread.start(); //should call quit() onDestroy of activity ? INSTANCE.handlerThread.quit()
+                    INSTANCE.application.registerActivityLifecycleCallbacks(INSTANCE.lifecycleHandler);
                 }
             }
         }

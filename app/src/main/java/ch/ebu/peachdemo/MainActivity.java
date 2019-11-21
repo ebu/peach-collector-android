@@ -49,7 +49,7 @@ public class MainActivity extends AppCompatActivity {
             String finalText = intent.getStringExtra(PEACH_LOG_NOTIFICATION_MESSAGE) + "\n" + previousText;
             logTextView.setText(finalText);
 
-            PeachCollector collector = PeachCollector.init(getApplicationContext());
+            PeachCollector collector = PeachCollector.init(getApplication());
             for (String publisherName: collector.publishers.keySet()) {
                 List<EventStatus> statuses = collector.database.peachCollectorEventDao().getPendingStatuses(publisherName);
                 if (publisherName.equalsIgnoreCase(DEFAULT_PUBLISHER)) {
@@ -78,7 +78,7 @@ public class MainActivity extends AppCompatActivity {
         publisher2Count = findViewById(R.id.publisher2_count);
 
         PeachCollector.isUnitTesting = true;
-        PeachCollector.init(getApplicationContext());
+        PeachCollector.init(getApplication());
 
         Publisher publisher = new Publisher("zzebu00000000017");
         PeachCollector.addPublisher(publisher, DEFAULT_PUBLISHER);
