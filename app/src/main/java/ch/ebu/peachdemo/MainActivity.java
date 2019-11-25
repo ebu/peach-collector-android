@@ -78,6 +78,7 @@ public class MainActivity extends AppCompatActivity {
         publisher2Count = findViewById(R.id.publisher2_count);
 
         PeachCollector.isUnitTesting = true;
+        PeachCollector.shouldCollectAnonymousEvents = true;
         PeachCollector.init(getApplication());
 
         Publisher publisher = new Publisher("zzebu00000000017");

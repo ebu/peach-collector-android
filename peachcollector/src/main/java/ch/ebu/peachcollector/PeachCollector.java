@@ -3,6 +3,7 @@ package ch.ebu.peachcollector;
 import android.app.Application;
 import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Handler;
 import android.os.HandlerThread;
 import android.os.Message;
@@ -14,9 +15,11 @@ import java.util.List;
 import java.util.Random;
 import java.util.Timer;
 import java.util.TimerTask;
+import java.util.UUID;
 import java.util.concurrent.Executor;
 import java.util.concurrent.Executors;
 
+import static android.content.Context.MODE_PRIVATE;
 import static ch.ebu.peachcollector.Constant.*;
 import static java.lang.Math.min;
 
@@ -26,19 +29,50 @@ public class PeachCollector {
     private static volatile Application application;
     public RoomDatabase database;
     public HashMap<String, Publisher> publishers;
-    public HashMap<String, Timer> publisherTimers;
-    public HashMap<String, Integer> publisherFailures;
+    private HashMap<String, Timer> publisherTimers;
+    private HashMap<String, Integer> publisherFailures;
     private Executor dbExecutor;
     private HandlerThread handlerThread;
+    private static String deviceID;
+    private static boolean limitedTrackingEnabled = false;
+
     public static String implementationVersion;
     public static String userID;
-    public static String deviceID;
+
+    public static boolean shouldCollectAnonymousEvents = false;
     public static boolean isUnitTesting = false;
+
     private LifecycleHandler lifecycleHandler = new LifecycleHandler();
 
     public static PeachCollector init(final Application app) {
         application = app;
         applicationContext = application.getApplicationContext();
+
+        new Thread(new Runnable() {
+            public void run() {
+                try {
+                    AdvertisingIdClient.AdInfo adInfo = AdvertisingIdClient.getAdvertisingIdInfo(applicationContext);
+                    limitedTrackingEnabled = adInfo.isLimitAdTrackingEnabled();
+                    if (!limitedTrackingEnabled){
+                        deviceID = adInfo.getId();
+                        if (deviceID == null) {
+                            SharedPreferences sPrefs= applicationContext.getSharedPreferences("PeachCollector", MODE_PRIVATE);
+                            deviceID = sPrefs.getString("device_id",null);
+
+                            if (deviceID == null) {
+                                deviceID = UUID.randomUUID().toString();
+                            }
+                            SharedPreferences.Editor editor = sPrefs.edit();
+                            editor.putString("device_id", deviceID);
+                            editor.apply();
+                        }
+                    }
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+            }
+        }).start();
+
         if (INSTANCE == null) {
             synchronized (RoomDatabase.class) {
                 if (INSTANCE == null) {
@@ -61,32 +95,39 @@ public class PeachCollector {
         return applicationContext;
     }
 
+    public static String getDeviceID(){
+        if (limitedTrackingEnabled || deviceID == null) return "Anonymous";
+        return deviceID;
+
+    }
 
     public static void sendEvent(final Event event) {
-        INSTANCE.dbExecutor.execute(new Runnable() {
-            @Override
-            public void run() {
-                long eventRowID = INSTANCE.database.peachCollectorEventDao().insert(event);
+        if (shouldCollectAnonymousEvents || !limitedTrackingEnabled || userID != null) {
+            INSTANCE.dbExecutor.execute(new Runnable() {
+                @Override
+                public void run() {
+                    long eventRowID = INSTANCE.database.peachCollectorEventDao().insert(event);
 
-                for (String publisherName: INSTANCE.publishers.keySet()) {
-                    Publisher publisher = INSTANCE.publishers.get(publisherName);
+                    for (String publisherName : INSTANCE.publishers.keySet()) {
+                        Publisher publisher = INSTANCE.publishers.get(publisherName);
 
-                    if (publisher.shouldProcessEvent(event)) {
-                        EventStatus status = new EventStatus((int)eventRowID, publisherName, 0);
-                        INSTANCE.database.peachCollectorEventDao().insert(status);
+                        if (publisher.shouldProcessEvent(event)) {
+                            EventStatus status = new EventStatus((int) eventRowID, publisherName, 0);
+                            INSTANCE.database.peachCollectorEventDao().insert(status);
+                        }
                     }
-                }
 
-                if (PeachCollector.isUnitTesting) {
-                    Intent intent = new Intent();
-                    intent.setAction(PEACH_LOG_NOTIFICATION);
-                    intent.putExtra(PEACH_LOG_NOTIFICATION_MESSAGE, "+ Event (" + event.getType() + ")");
-                    applicationContext.sendBroadcast(intent);
-                }
+                    if (PeachCollector.isUnitTesting) {
+                        Intent intent = new Intent();
+                        intent.setAction(PEACH_LOG_NOTIFICATION);
+                        intent.putExtra(PEACH_LOG_NOTIFICATION_MESSAGE, "+ Event (" + event.getType() + ")");
+                        applicationContext.sendBroadcast(intent);
+                    }
 
-                INSTANCE.checkPublishers();
-            }
-        });
+                    INSTANCE.checkPublishers();
+                }
+            });
+        }
     }
 
     public static void addPublisher(Publisher publisher, String publisherName) {
