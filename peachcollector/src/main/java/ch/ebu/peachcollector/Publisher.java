@@ -5,9 +5,12 @@ import android.content.pm.ApplicationInfo;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
 import android.content.res.Configuration;
+import android.graphics.Point;
 import android.os.AsyncTask;
+import android.os.Build;
 import android.os.Handler;
 import android.util.DisplayMetrics;
+import android.view.Display;
 import android.view.WindowManager;
 
 import org.json.JSONObject;
@@ -119,11 +122,28 @@ public class Publisher {
     public static Map<String, Object> deviceInfo(){
         HashMap<String, Object> deviceInfo = new HashMap<>();
 
+        String screenResolution = "unknown";
         DisplayMetrics displayMetrics = new DisplayMetrics();
         WindowManager windowManager = (WindowManager) PeachCollector.getApplicationContext().getSystemService(Context.WINDOW_SERVICE);
-        windowManager.getDefaultDisplay().getMetrics(displayMetrics);
-        int height = displayMetrics.heightPixels;
-        int width = displayMetrics.widthPixels;
+        if (windowManager != null) {
+            Display display = windowManager.getDefaultDisplay();
+            display.getMetrics(displayMetrics);
+
+            int mHeightPixels = displayMetrics.heightPixels;
+            int mWidthPixels = displayMetrics.widthPixels;
+
+            if (Build.VERSION.SDK_INT >= 17) {
+                try {
+                    Point realSize = new Point();
+                    Display.class.getMethod("getRealSize", Point.class).invoke(display, realSize);
+                    mWidthPixels = realSize.x;
+                    mHeightPixels = realSize.y;
+                } catch (Exception ignored) { }
+            }
+
+            screenResolution = mWidthPixels + "x" + mHeightPixels;
+        }
+
         boolean isTablet = PeachCollector.getApplicationContext().getResources().getBoolean(R.bool.isTablet);
 
         TimeZone tz = TimeZone.getDefault();
@@ -133,7 +153,7 @@ public class Publisher {
         deviceInfo.put(DEVICE_TYPE_KEY, isTablet ? Constant.ClientDeviceType.Tablet : Constant.ClientDeviceType.Phone);
         deviceInfo.put(DEVICE_VENDOR_KEY, android.os.Build.MANUFACTURER + ", " + android.os.Build.BRAND);
         deviceInfo.put(DEVICE_MODEL_KEY, android.os.Build.MODEL + ", " + android.os.Build.PRODUCT);
-        deviceInfo.put(DEVICE_SCREEN_SIZE_KEY, width + "x" + height);
+        deviceInfo.put(DEVICE_SCREEN_SIZE_KEY, screenResolution);
         deviceInfo.put(DEVICE_LANGUAGE_KEY, Locale.getDefault().getDisplayLanguage());
         deviceInfo.put(DEVICE_TIMEZONE_KEY, offsetFromUtc);
 
