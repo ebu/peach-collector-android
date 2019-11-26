@@ -10,6 +10,7 @@ import android.os.Message;
 import android.util.Log;
 
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Random;
@@ -24,6 +25,7 @@ import static ch.ebu.peachcollector.Constant.*;
 import static java.lang.Math.min;
 
 public class PeachCollector {
+
     private static volatile PeachCollector INSTANCE;
     private static volatile Context applicationContext;
     private static volatile Application application;
@@ -35,19 +37,57 @@ public class PeachCollector {
     private HandlerThread handlerThread;
     private static String deviceID;
     private static boolean limitedTrackingEnabled = false;
-
-    public static String implementationVersion;
-    public static String userID;
-
-    public static boolean shouldCollectAnonymousEvents = false;
-    public static boolean isUnitTesting = false;
-
     private LifecycleHandler lifecycleHandler = new LifecycleHandler();
 
+    /**
+     *  Implementation version of the framework
+     *  Value is null by default, it will not be sent unless set
+     */
+    public static String implementationVersion;
+
+    /**
+     *  User unique identifier that should be set as soon as a user is logged in
+     */
+    public static String userID;
+
+    /**
+     *  The Device ID used by the framework is the Advertising ID provided by Apple.
+     *  This ID can be reseted or even null. If the Advertising Id is null and the user is not logged in,
+     *  collecting of the events should be stopped unless if it is needed for anonymous analytics.
+     *  When set to `true`, collection will work even if there is no Device ID and User ID
+     *  Default value is `false`.
+     */
+    public static boolean shouldCollectAnonymousEvents = false;
+
+    /**
+     *  When set to `true`, notifications will be emitted when events are recorded and when they are sent
+     *  @see Constant for notification name and parameters
+     *  Default value is `false`.
+     */
+    public static boolean isUnitTesting = false;
+
+
+    /**
+     * Minimum duration (in seconds) of inactivity that will cause sessionStartTimestamp to be reset when app becomes active
+     * Default is 1800 seconds (30 minutes)
+     */
+    public static long inactivityInterval = 1800000;
+
+    /**
+     * Timestamp of the start of the session
+     */
+    static long sessionStartTimestamp;
+
+
+    /**
+     * Timestamp of the start of the session
+     * @param app application reference, usually retrieved with `getApplication()`
+     */
     public static PeachCollector init(final Application app) {
         application = app;
         applicationContext = application.getApplicationContext();
 
+        sessionStartTimestamp = (new Date()).getTime();
         new Thread(new Runnable() {
             public void run() {
                 try {
@@ -95,6 +135,9 @@ public class PeachCollector {
         return applicationContext;
     }
 
+    /**
+     *  Device unique identifier (advertising identifier when ad tracking is not limited, "Anonymous" otherwise)
+     */
     public static String getDeviceID(){
         if (limitedTrackingEnabled || deviceID == null) return "Anonymous";
         return deviceID;
@@ -130,6 +173,12 @@ public class PeachCollector {
         }
     }
 
+    /**
+     *  Adds a publisher to the list of publishers linked to the queue
+     *  A custom Publisher can send the events to another end point, potentially in a different format.
+     *  @param publisher The publisher to add.
+     *  @param publisherName The unique name of the publisher.
+     */
     public static void addPublisher(Publisher publisher, String publisherName) {
         INSTANCE.publishers.put(publisherName, publisher);
         // in case of a crash while sending events, reset related events statuses
@@ -317,9 +366,7 @@ public class PeachCollector {
     }
 
 
-
-    private int interval(String publisherName, boolean shouldFollowPolicy)
-    {
+    private int interval(String publisherName, boolean shouldFollowPolicy) {
         final Publisher publisher = publishers.get(publisherName);
         Integer numberOfFailures = publisherFailures.get(publisherName);
         if (numberOfFailures != null){
@@ -338,4 +385,16 @@ public class PeachCollector {
         return publisher.interval;
     }
 
+    static void checkInactivity() {
+        long currentTimestamp = (new Date()).getTime();
+        SharedPreferences sPrefs= applicationContext.getSharedPreferences("PeachCollector", MODE_PRIVATE);
+        sessionStartTimestamp = sPrefs.getLong(SESSION_START_TIMESTAMP_SPREF_KEY, currentTimestamp);
+        long lastActiveTimestamp = sPrefs.getLong(SESSION_LAST_ACTIVE_TIMESTAMP_SPREF_KEY, currentTimestamp);
+
+        if (currentTimestamp - lastActiveTimestamp > inactivityInterval) {
+            sessionStartTimestamp = currentTimestamp;
+            sPrefs.edit().putLong(SESSION_START_TIMESTAMP_SPREF_KEY, sessionStartTimestamp).apply();
+        }
+        sPrefs.edit().putLong(SESSION_LAST_ACTIVE_TIMESTAMP_SPREF_KEY, currentTimestamp).apply();
+    }
 }

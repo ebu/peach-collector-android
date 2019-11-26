@@ -182,6 +182,7 @@ public class Publisher {
         if (PeachCollector.implementationVersion != null) {
             map.put(PEACH_IMPLEMENTATION_VERSION_KEY, PeachCollector.implementationVersion);
         }
+        map.put(SESSION_START_TIMESTAMP_KEY, PeachCollector.sessionStartTimestamp);
         map.put(SENT_TIMESTAMP_KEY, (new Date()).getTime());
         map.put(CLIENT_KEY, clientInfo());
 

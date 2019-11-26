@@ -5,6 +5,9 @@ public class Constant {
     public static final String PEACH_LOG_NOTIFICATION = "ch.ebu.testingLog";
     public static final String PEACH_LOG_NOTIFICATION_MESSAGE = "Message";
 
+    public static final String SESSION_START_TIMESTAMP_SPREF_KEY = "PeachCollectorSessionStartTimestampKey";
+    public static final String SESSION_LAST_ACTIVE_TIMESTAMP_SPREF_KEY = "PeachCollectorLastRecordedEventTimestampKey";
+
     public static final String PEACH_SCHEMA_VERSION_KEY = "peach_schema_version";
     public static final String PEACH_FRAMEWORK_VERSION_KEY = "peach_framework_version";
     public static final String PEACH_IMPLEMENTATION_VERSION_KEY = "peach_implementation_version";

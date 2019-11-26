@@ -2,7 +2,13 @@ package ch.ebu.peachcollector;
 
 import android.app.Activity;
 import android.app.Application;
+import android.content.SharedPreferences;
 import android.os.Bundle;
+
+import java.util.Date;
+
+import static android.content.Context.MODE_PRIVATE;
+import static ch.ebu.peachcollector.Constant.SESSION_LAST_ACTIVE_TIMESTAMP_SPREF_KEY;
 
 public class LifecycleHandler implements Application.ActivityLifecycleCallbacks {
     private static int resumed;
@@ -21,6 +27,7 @@ public class LifecycleHandler implements Application.ActivityLifecycleCallbacks 
     @Override
     public void onActivityResumed(Activity activity) {
         ++resumed;
+        PeachCollector.checkInactivity();
     }
 
     @Override
@@ -28,6 +35,7 @@ public class LifecycleHandler implements Application.ActivityLifecycleCallbacks 
         ++paused;
         if(resumed <= paused) { // Application is not in foreground
             PeachCollector.flush();
+            updateLastActiveTimestamp();
         }
     }
 
@@ -38,6 +46,7 @@ public class LifecycleHandler implements Application.ActivityLifecycleCallbacks 
     @Override
     public void onActivityStarted(Activity activity) {
         ++started;
+        PeachCollector.checkInactivity();
     }
 
     @Override
@@ -45,9 +54,14 @@ public class LifecycleHandler implements Application.ActivityLifecycleCallbacks 
         ++stopped;
         if(started <= stopped) { // Application is not visible
             PeachCollector.flush();
+            updateLastActiveTimestamp();
         }
     }
 
+    void updateLastActiveTimestamp(){
+        SharedPreferences sPrefs= PeachCollector.getApplicationContext().getSharedPreferences("PeachCollector", MODE_PRIVATE);
+        sPrefs.edit().putLong(SESSION_LAST_ACTIVE_TIMESTAMP_SPREF_KEY, (new Date()).getTime()).apply();
+    }
 
     public static boolean isApplicationVisible() {
         return started > stopped;
