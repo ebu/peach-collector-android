@@ -67,6 +67,11 @@ public class Constant {
     public static final String OS_NAME_KEY = "name";
     public static final String OS_VERSION_KEY = "version";
 
+    public final class ClientDeviceType {
+        public static final String Phone = "phone";
+        public static final String Tablet = "tablet";
+    }
+
 
     public final class EventType {
         public static final String MediaPlay = "media_play"; // MEDIA

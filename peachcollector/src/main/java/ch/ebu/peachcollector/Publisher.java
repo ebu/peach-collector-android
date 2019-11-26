@@ -124,12 +124,13 @@ public class Publisher {
         windowManager.getDefaultDisplay().getMetrics(displayMetrics);
         int height = displayMetrics.heightPixels;
         int width = displayMetrics.widthPixels;
+        boolean isTablet = PeachCollector.getApplicationContext().getResources().getBoolean(R.bool.isTablet);
 
         TimeZone tz = TimeZone.getDefault();
         Date now = new Date();
         double offsetFromUtc = tz.getOffset(now.getTime()) / 3600000.0;
 
-        deviceInfo.put(DEVICE_TYPE_KEY, android.os.Build.DEVICE);
+        deviceInfo.put(DEVICE_TYPE_KEY, isTablet ? Constant.ClientDeviceType.Tablet : Constant.ClientDeviceType.Phone);
         deviceInfo.put(DEVICE_VENDOR_KEY, android.os.Build.MANUFACTURER + ", " + android.os.Build.BRAND);
         deviceInfo.put(DEVICE_MODEL_KEY, android.os.Build.MODEL + ", " + android.os.Build.PRODUCT);
         deviceInfo.put(DEVICE_SCREEN_SIZE_KEY, width + "x" + height);
