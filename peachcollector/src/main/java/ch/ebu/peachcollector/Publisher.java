@@ -7,7 +7,6 @@ import android.content.pm.PackageManager;
 import android.content.res.Configuration;
 import android.os.AsyncTask;
 import android.os.Handler;
-import android.os.Message;
 import android.util.DisplayMetrics;
 import android.view.WindowManager;
 
@@ -109,7 +108,7 @@ public class Publisher {
         String applicationName = (stringId == 0) ? applicationInfo.nonLocalizedLabel.toString() : appContext.getString(stringId);
         if (applicationName.length() == 0) applicationName = "unknown";
         clientInfo.put(CLIENT_APP_NAME_KEY, applicationName);
-        //TODO clientInfo.put(CLIENT_ID_KEY, "");
+        clientInfo.put(CLIENT_ID_KEY, PeachCollector.getDeviceID());
 
         clientInfo.put(DEVICE_KEY, deviceInfo());
         clientInfo.put(OS_KEY, osInfo());
@@ -158,7 +157,7 @@ public class Publisher {
 
         HashMap map = new HashMap();
         map.put(PEACH_SCHEMA_VERSION_KEY, "1.0.3");
-        map.put(PEACH_FRAMEWORK_VERSION_KEY, "1.0.0");
+        map.put(PEACH_FRAMEWORK_VERSION_KEY, BuildConfig.VERSION_NAME + "b" + BuildConfig.VERSION_CODE);
         if (PeachCollector.implementationVersion != null) {
             map.put(PEACH_IMPLEMENTATION_VERSION_KEY, PeachCollector.implementationVersion);
         }
@@ -179,10 +178,8 @@ public class Publisher {
             map.put(USER_ID_KEY, PeachCollector.userID);
         }
 
-        //[data setObject:@(PeachCollector.sessionStartTimestamp) forKey:PCSessionStartTimestampKey];
         JSONObject obj=new JSONObject(map);
         new PostTask(finishHandler).execute(obj.toString());
-
     }
 
 
