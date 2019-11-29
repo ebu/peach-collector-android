@@ -108,8 +108,14 @@ public class Publisher {
         }
 
         ApplicationInfo applicationInfo = appContext.getApplicationInfo();
-        int stringId = applicationInfo.labelRes;
-        String applicationName = (stringId == 0) ? applicationInfo.nonLocalizedLabel.toString() : appContext.getString(stringId);
+        CharSequence applicationLabel = appContext.getPackageManager().getApplicationLabel(applicationInfo);
+        String applicationName = "";
+        if (applicationLabel != null) {
+            applicationName = applicationLabel.toString();
+        }
+        else {
+            applicationName = (applicationInfo.labelRes == 0 && applicationInfo.nonLocalizedLabel != null) ? applicationInfo.nonLocalizedLabel.toString() : appContext.getString(applicationInfo.labelRes);
+        }
         if (applicationName.length() == 0) applicationName = "unknown";
         clientInfo.put(CLIENT_APP_NAME_KEY, applicationName);
         clientInfo.put(CLIENT_ID_KEY, PeachCollector.getDeviceID());
