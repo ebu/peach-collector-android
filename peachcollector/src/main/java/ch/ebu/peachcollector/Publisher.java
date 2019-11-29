@@ -1,6 +1,7 @@
 package ch.ebu.peachcollector;
 
 import android.content.Context;
+import android.content.Intent;
 import android.content.pm.ApplicationInfo;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
@@ -201,6 +202,14 @@ public class Publisher {
         }
 
         JSONObject obj=new JSONObject(map);
+
+        if (PeachCollector.isUnitTesting) {
+            Intent intent = new Intent();
+            intent.setAction(PEACH_LOG_NOTIFICATION);
+            intent.putExtra(PEACH_LOG_NOTIFICATION_PAYLOAD, obj.toString());
+            PeachCollector.getApplicationContext().sendBroadcast(intent);
+        }
+
         new PostTask(finishHandler).execute(obj.toString());
     }
 

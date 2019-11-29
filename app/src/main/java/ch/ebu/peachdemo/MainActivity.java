@@ -11,6 +11,7 @@ import android.content.IntentFilter;
 import android.os.Bundle;
 import android.text.method.ScrollingMovementMethod;
 import android.util.AttributeSet;
+import android.util.Log;
 import android.view.View;
 import android.widget.TextView;
 
@@ -46,8 +47,15 @@ public class MainActivity extends AppCompatActivity {
         @Override
         public void onReceive(Context context, Intent intent) {
             String previousText = logTextView.getText().toString();
-            String finalText = intent.getStringExtra(PEACH_LOG_NOTIFICATION_MESSAGE) + "\n" + previousText;
-            logTextView.setText(finalText);
+            String newText = intent.getStringExtra(PEACH_LOG_NOTIFICATION_MESSAGE);
+            if (newText != null) {
+                String finalText = newText + "\n" + previousText;
+                logTextView.setText(finalText);
+            }
+            else{
+                String payload = intent.getStringExtra(PEACH_LOG_NOTIFICATION_PAYLOAD);
+                Log.d("PEACH COLLECTOR", payload);
+            }
 
             PeachCollector collector = PeachCollector.init(getApplication());
             for (String publisherName: collector.publishers.keySet()) {
