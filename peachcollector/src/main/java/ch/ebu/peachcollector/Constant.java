@@ -4,6 +4,7 @@ public class Constant {
 
     public static final String PEACH_LOG_NOTIFICATION = "ch.ebu.testingLog";
     public static final String PEACH_LOG_NOTIFICATION_MESSAGE = "Message";
+    public static final String PEACH_LOG_NOTIFICATION_PAYLOAD = "Payload";
 
     public static final String SESSION_START_TIMESTAMP_SPREF_KEY = "PeachCollectorSessionStartTimestampKey";
     public static final String SESSION_LAST_ACTIVE_TIMESTAMP_SPREF_KEY = "PeachCollectorLastRecordedEventTimestampKey";
@@ -75,6 +76,43 @@ public class Constant {
         public static final String Tablet = "tablet";
     }
 
+    public final class Media {
+        public final class VideoMode {
+            public static final String Bar = "bar";
+            public static final String Mini = "mini";
+            public static final String Normal = "normal";
+            public static final String Wide = "wide";
+            public static final String Pip = "pip";
+            public static final String FullScreen = "fullscreen";
+            public static final String Cast = "cast";
+            public static final String Preview = "preview";
+        }
+
+        public final class AudioMode {
+            public static final String Normal = "normal";
+            public static final String Background = "background";
+            public static final String Muted = "muted";
+        }
+
+        public final class StartMode {
+            public static final String Normal = "normal";
+            public static final String AutoPlay = "auto_play";
+            public static final String AutoContinue = "auto_continue";
+        }
+
+        public final class MetadataType {
+            public static final String Audio = "audio";
+            public static final String Video = "video";
+            public static final String Article = "article";
+            public static final String Page = "page";
+        }
+
+        public final class MetadataFormat {
+            public static final String Demand = "ondemand";
+            public static final String Live = "live";
+            public static final String DVR = "dvr";
+        }
+    }
 
     public final class EventType {
         public static final String MediaPlay = "media_play"; // MEDIA

@@ -26,7 +26,7 @@ import static java.lang.Math.min;
 
 public class PeachCollector {
 
-    private static volatile PeachCollector INSTANCE;
+    public static volatile PeachCollector sharedCollector;
     private static volatile Context applicationContext;
     private static volatile Application application;
     public RoomDatabase database;
@@ -76,7 +76,7 @@ public class PeachCollector {
     /**
      * Timestamp of the start of the session
      */
-    static long sessionStartTimestamp;
+    public static long sessionStartTimestamp;
 
 
     /**
@@ -113,22 +113,22 @@ public class PeachCollector {
             }
         }).start();
 
-        if (INSTANCE == null) {
+        if (sharedCollector == null) {
             synchronized (RoomDatabase.class) {
-                if (INSTANCE == null) {
-                    INSTANCE = new PeachCollector();
-                    INSTANCE.database = RoomDatabase.getDatabase(applicationContext);
-                    INSTANCE.publishers = new HashMap<>();
-                    INSTANCE.publisherTimers = new HashMap<>();
-                    INSTANCE.publisherFailures = new HashMap<>();
-                    INSTANCE.dbExecutor = Executors.newSingleThreadExecutor();
-                    INSTANCE.handlerThread = new HandlerThread("PeachCollectorPostHandler");
-                    INSTANCE.handlerThread.start(); //should call quit() onDestroy of activity ? INSTANCE.handlerThread.quit()
-                    INSTANCE.application.registerActivityLifecycleCallbacks(INSTANCE.lifecycleHandler);
+                if (sharedCollector == null) {
+                    sharedCollector = new PeachCollector();
+                    sharedCollector.database = RoomDatabase.getDatabase(applicationContext);
+                    sharedCollector.publishers = new HashMap<>();
+                    sharedCollector.publisherTimers = new HashMap<>();
+                    sharedCollector.publisherFailures = new HashMap<>();
+                    sharedCollector.dbExecutor = Executors.newSingleThreadExecutor();
+                    sharedCollector.handlerThread = new HandlerThread("PeachCollectorPostHandler");
+                    sharedCollector.handlerThread.start(); //should call quit() onDestroy of activity ? sharedCollector.handlerThread.quit()
+                    sharedCollector.application.registerActivityLifecycleCallbacks(sharedCollector.lifecycleHandler);
                 }
             }
         }
-        return INSTANCE;
+        return sharedCollector;
     }
 
     protected static Context getApplicationContext() {
@@ -146,17 +146,17 @@ public class PeachCollector {
 
     public static void sendEvent(final Event event) {
         if (shouldCollectAnonymousEvents || !limitedTrackingEnabled || userID != null) {
-            INSTANCE.dbExecutor.execute(new Runnable() {
+            sharedCollector.dbExecutor.execute(new Runnable() {
                 @Override
                 public void run() {
-                    long eventRowID = INSTANCE.database.peachCollectorEventDao().insert(event);
+                    long eventRowID = sharedCollector.database.peachCollectorEventDao().insert(event);
 
-                    for (String publisherName : INSTANCE.publishers.keySet()) {
-                        Publisher publisher = INSTANCE.publishers.get(publisherName);
+                    for (String publisherName : sharedCollector.publishers.keySet()) {
+                        Publisher publisher = sharedCollector.publishers.get(publisherName);
 
                         if (publisher.shouldProcessEvent(event)) {
                             EventStatus status = new EventStatus((int) eventRowID, publisherName, 0);
-                            INSTANCE.database.peachCollectorEventDao().insert(status);
+                            sharedCollector.database.peachCollectorEventDao().insert(status);
                         }
                     }
 
@@ -167,7 +167,7 @@ public class PeachCollector {
                         applicationContext.sendBroadcast(intent);
                     }
 
-                    INSTANCE.checkPublishers();
+                    sharedCollector.checkPublishers();
                 }
             });
         }
@@ -180,11 +180,11 @@ public class PeachCollector {
      *  @param publisherName The unique name of the publisher.
      */
     public static void addPublisher(Publisher publisher, String publisherName) {
-        INSTANCE.publishers.put(publisherName, publisher);
+        sharedCollector.publishers.put(publisherName, publisher);
         // in case of a crash while sending events, reset related events statuses
-        INSTANCE.resetPublisherStatuses(publisherName);
+        sharedCollector.resetPublisherStatuses(publisherName);
         // send events in the database that are queued for this publisher
-        INSTANCE.sendEventsToPublisher(publisherName);
+        sharedCollector.sendEventsToPublisher(publisherName);
     }
 
     private void resetPublisherStatuses(final String publisherName){
@@ -201,18 +201,18 @@ public class PeachCollector {
     }
 
     public static void clean() {
-        INSTANCE.cleanTimers();
-        INSTANCE.dbExecutor.execute(new Runnable() {
+        sharedCollector.cleanTimers();
+        sharedCollector.dbExecutor.execute(new Runnable() {
             @Override
             public void run() {
-                INSTANCE.database.peachCollectorEventDao().deleteAll();
+                sharedCollector.database.peachCollectorEventDao().deleteAll();
             }
         });
     }
 
     public static void flush() {
-        for (String publisherName :INSTANCE.publishers.keySet()) {
-            INSTANCE.sendEventsToPublisher(publisherName);
+        for (String publisherName : sharedCollector.publishers.keySet()) {
+            sharedCollector.sendEventsToPublisher(publisherName);
         }
     }
 
@@ -228,7 +228,7 @@ public class PeachCollector {
         dbExecutor.execute(new Runnable() {
             @Override
             public void run() {
-                List<EventStatus> statuses = INSTANCE.database.peachCollectorEventDao().getStatuses(publisherName);
+                List<EventStatus> statuses = sharedCollector.database.peachCollectorEventDao().getStatuses(publisherName);
 
                 int pendingEventsCount = 0;
                 for (EventStatus status: statuses) {
@@ -275,7 +275,7 @@ public class PeachCollector {
         }
     }
     private void cleanTimers(){
-        for (String publisherName: INSTANCE.publishers.keySet()) {
+        for (String publisherName: sharedCollector.publishers.keySet()) {
             cleanTimer(publisherName);
         }
     }
