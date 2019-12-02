@@ -1,13 +1,17 @@
 package ch.ebu.peachcollector;
 
 import android.content.Context;
+import android.content.Intent;
 import android.content.pm.ApplicationInfo;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
 import android.content.res.Configuration;
+import android.graphics.Point;
 import android.os.AsyncTask;
+import android.os.Build;
 import android.os.Handler;
 import android.util.DisplayMetrics;
+import android.view.Display;
 import android.view.WindowManager;
 
 import org.json.JSONObject;
@@ -104,11 +108,17 @@ public class Publisher {
         }
 
         ApplicationInfo applicationInfo = appContext.getApplicationInfo();
-        int stringId = applicationInfo.labelRes;
-        String applicationName = (stringId == 0) ? applicationInfo.nonLocalizedLabel.toString() : appContext.getString(stringId);
+        CharSequence applicationLabel = appContext.getPackageManager().getApplicationLabel(applicationInfo);
+        String applicationName = "";
+        if (applicationLabel != null) {
+            applicationName = applicationLabel.toString();
+        }
+        else {
+            applicationName = (applicationInfo.labelRes == 0 && applicationInfo.nonLocalizedLabel != null) ? applicationInfo.nonLocalizedLabel.toString() : appContext.getString(applicationInfo.labelRes);
+        }
         if (applicationName.length() == 0) applicationName = "unknown";
         clientInfo.put(CLIENT_APP_NAME_KEY, applicationName);
-        //TODO clientInfo.put(CLIENT_ID_KEY, "");
+        clientInfo.put(CLIENT_ID_KEY, PeachCollector.getDeviceID());
 
         clientInfo.put(DEVICE_KEY, deviceInfo());
         clientInfo.put(OS_KEY, osInfo());
@@ -119,20 +129,38 @@ public class Publisher {
     public static Map<String, Object> deviceInfo(){
         HashMap<String, Object> deviceInfo = new HashMap<>();
 
+        String screenResolution = "unknown";
         DisplayMetrics displayMetrics = new DisplayMetrics();
         WindowManager windowManager = (WindowManager) PeachCollector.getApplicationContext().getSystemService(Context.WINDOW_SERVICE);
-        windowManager.getDefaultDisplay().getMetrics(displayMetrics);
-        int height = displayMetrics.heightPixels;
-        int width = displayMetrics.widthPixels;
+        if (windowManager != null) {
+            Display display = windowManager.getDefaultDisplay();
+            display.getMetrics(displayMetrics);
+
+            int mHeightPixels = displayMetrics.heightPixels;
+            int mWidthPixels = displayMetrics.widthPixels;
+
+            if (Build.VERSION.SDK_INT >= 17) {
+                try {
+                    Point realSize = new Point();
+                    Display.class.getMethod("getRealSize", Point.class).invoke(display, realSize);
+                    mWidthPixels = realSize.x;
+                    mHeightPixels = realSize.y;
+                } catch (Exception ignored) { }
+            }
+
+            screenResolution = mWidthPixels + "x" + mHeightPixels;
+        }
+
+        boolean isTablet = PeachCollector.getApplicationContext().getResources().getBoolean(R.bool.isTablet);
 
         TimeZone tz = TimeZone.getDefault();
         Date now = new Date();
         double offsetFromUtc = tz.getOffset(now.getTime()) / 3600000.0;
 
-        deviceInfo.put(DEVICE_TYPE_KEY, android.os.Build.DEVICE);
+        deviceInfo.put(DEVICE_TYPE_KEY, isTablet ? Constant.ClientDeviceType.Tablet : Constant.ClientDeviceType.Phone);
         deviceInfo.put(DEVICE_VENDOR_KEY, android.os.Build.MANUFACTURER + ", " + android.os.Build.BRAND);
         deviceInfo.put(DEVICE_MODEL_KEY, android.os.Build.MODEL + ", " + android.os.Build.PRODUCT);
-        deviceInfo.put(DEVICE_SCREEN_SIZE_KEY, width + "x" + height);
+        deviceInfo.put(DEVICE_SCREEN_SIZE_KEY, screenResolution);
         deviceInfo.put(DEVICE_LANGUAGE_KEY, Locale.getDefault().getDisplayLanguage());
         deviceInfo.put(DEVICE_TIMEZONE_KEY, offsetFromUtc);
 
@@ -157,10 +185,11 @@ public class Publisher {
 
         HashMap map = new HashMap();
         map.put(PEACH_SCHEMA_VERSION_KEY, "1.0.3");
-        map.put(PEACH_FRAMEWORK_VERSION_KEY, "1.0.0");
+        map.put(PEACH_FRAMEWORK_VERSION_KEY, BuildConfig.VERSION_NAME + "b" + BuildConfig.VERSION_CODE);
         if (PeachCollector.implementationVersion != null) {
             map.put(PEACH_IMPLEMENTATION_VERSION_KEY, PeachCollector.implementationVersion);
         }
+        map.put(SESSION_START_TIMESTAMP_KEY, PeachCollector.sessionStartTimestamp);
         map.put(SENT_TIMESTAMP_KEY, (new Date()).getTime());
         map.put(CLIENT_KEY, clientInfo());
 
@@ -178,10 +207,16 @@ public class Publisher {
             map.put(USER_ID_KEY, PeachCollector.userID);
         }
 
-        //[data setObject:@(PeachCollector.sessionStartTimestamp) forKey:PCSessionStartTimestampKey];
         JSONObject obj=new JSONObject(map);
-        new PostTask(finishHandler).execute(obj.toString());
 
+        if (PeachCollector.isUnitTesting) {
+            Intent intent = new Intent();
+            intent.setAction(PEACH_LOG_NOTIFICATION);
+            intent.putExtra(PEACH_LOG_NOTIFICATION_PAYLOAD, obj.toString());
+            PeachCollector.getApplicationContext().sendBroadcast(intent);
+        }
+
+        new PostTask(finishHandler).execute(obj.toString());
     }
 
 
@@ -197,7 +232,7 @@ public class Publisher {
         @Override
         protected String doInBackground(String... params) {
             String data = params[0];
-
+            int responseCode = 0;
             try{
                 URL url = new URL(serviceURL);
                 HttpURLConnection httpURLConnection = (HttpURLConnection)url.openConnection();
@@ -208,30 +243,30 @@ public class Publisher {
                 writer.write(data);
                 writer.flush();
                 //get response code and check if valid (HTTP OK)
-                int responseCode = httpURLConnection.getResponseCode();
-                if(responseCode == 201){//if valid, read result from server
+                responseCode = httpURLConnection.getResponseCode();
+                if(responseCode != 201){
                     BufferedReader reader = new BufferedReader(new InputStreamReader(httpURLConnection.getInputStream()));
                     String line;
                     StringBuilder stringBuilder = new StringBuilder();
                     while((line = reader.readLine()) != null){
                         stringBuilder.append(line);
                     }
+                    stringBuilder.insert(0, "Error: ");
                     return stringBuilder.toString();
                 }
+                return null;
             } catch (MalformedURLException e) {
                 e.printStackTrace();
             } catch (IOException e) {
                 e.printStackTrace();
             }
-            return null;
+            return "Error " + responseCode;
         }
 
         @Override
         protected void onPostExecute(String result) {
-            // something...
             if (completionHandler != null) {
-                //Message msg = completionHandler.obtainMessage();
-                completionHandler.sendEmptyMessage(0);
+                completionHandler.sendEmptyMessage(result != null ? 1 : 0);
             }
         }
     }

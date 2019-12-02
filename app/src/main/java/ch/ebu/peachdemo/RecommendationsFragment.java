@@ -53,7 +53,7 @@ public class RecommendationsFragment extends Fragment {
         component.version = "1.0";
 
 
-        Event.sendRecommendationDisplayed("reco00", items , 4, null, null, component);
+        Event.sendRecommendationDisplayed("reco00", items , null, null, component);
 
 
         View.OnClickListener buttonListener = new View.OnClickListener() {
@@ -64,7 +64,7 @@ public class RecommendationsFragment extends Fragment {
                     ImageButton button = imageButtons[i];
                     if (button == v) index = i;
                 }
-                Event.sendRecommendationHit("reco00", items , 4, index, null, null, component);
+                Event.sendRecommendationHit("reco00", items.get(index), index, null, null, component);
 
                 if(index == 0){
                     getParentFragmentManager().beginTransaction().replace(R.id.fragmentContainer, new MediaFragment(), "media").addToBackStack("media").commit();

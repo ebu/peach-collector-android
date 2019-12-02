@@ -118,45 +118,37 @@ public class Event {
     /**
      *  Send a recommendation hit event. Event will be added to the queue and sent accordingly to publishers' configurations.
      *  @param recommendationID    Unique identifier of the recommendation.
-     *  @param items List of unique identifiers for the clips, medias or articles recommended
-     *  @param itemsDisplayedCount Number of items displayed (can be less than the number of items, if the recommendation component is a scroll view for example)
+     *  @param itemID Unique identifier for the clip, media or article hit
      *  @param hitIndex Index of the item that has been hit
      *  @param appSectionID Unique identifier of app section where the recommendation is displayed
      *  @param source Identifier of the element in which the recommendation is displayed (the module, view or popup)
      *  @param component Description of the element in which the recommendation is displayed
      */
     public static void sendRecommendationHit(@NonNull String recommendationID,
-                                             @NonNull List<String> items,
-                                             @NonNull Number itemsDisplayedCount,
+                                             @NonNull String itemID,
                                              @NonNull Number hitIndex,
                                              @Nullable String appSectionID,
                                              @Nullable String source,
                                              @Nullable EventContextComponent component){
-        Event event = new Event(recommendationID, Constant.EventType.RecommendationHit);
-        EventContext context = EventContext.recommendationContext(items, appSectionID, source, component, itemsDisplayedCount, hitIndex);
-        event.setContext(context);
-        PeachCollector.sendEvent(event);
+        EventContext context = EventContext.recommendationContext(null, appSectionID, source, component, hitIndex, itemID);
+        Event.send(Constant.EventType.RecommendationHit, recommendationID, null, context, null);
     }
 
     /**
      *  Send a recommendation displayed event. Event will be added to the queue and sent accordingly to publishers' configurations.
      *  @param recommendationID Unique identifier of the recommendation.
-     *  @param items List of unique identifiers for the clips, medias or articles recommended
-     *  @param itemsDisplayedCount Number of items displayed (can be less than the number of items, if the recommendation component is a scroll view for example)
+     *  @param itemsDisplayed List of unique identifiers for the clips, medias or articles show/displayed
      *  @param appSectionID Unique identifier of app section where the recommendation is displayed
      *  @param source Identifier of the element in which the recommendation is displayed (the module, view or popup)
      *  @param component Description of the element in which the recommendation is displayed
      */
     public static void sendRecommendationDisplayed(@NonNull String recommendationID,
-                                                   @NonNull List<String> items,
-                                                   @NonNull Number itemsDisplayedCount,
+                                                   @NonNull List<String> itemsDisplayed,
                                                    @Nullable String appSectionID,
                                                    @Nullable String source,
                                                    @Nullable EventContextComponent component) {
-        Event event = new Event(recommendationID, Constant.EventType.RecommendationDisplayed);
-        EventContext context = EventContext.recommendationContext(items, appSectionID, source, component, itemsDisplayedCount, null);
-        event.setContext(context);
-        PeachCollector.sendEvent(event);
+        EventContext context = EventContext.recommendationContext(itemsDisplayed, appSectionID, source, component, null, null);
+        Event.send(Constant.EventType.RecommendationDisplayed, recommendationID, null, context, null);
     }
 
     /**
@@ -172,10 +164,8 @@ public class Event {
                                                 @Nullable String appSectionID,
                                                 @Nullable String source,
                                                 @Nullable EventContextComponent component) {
-        Event event = new Event(recommendationID, Constant.EventType.RecommendationLoaded);
         EventContext context = EventContext.recommendationContext(items, appSectionID, source, component, null, null);
-        event.setContext(context);
-        PeachCollector.sendEvent(event);
+        Event.send(Constant.EventType.RecommendationLoaded, recommendationID, null, context, null);
     }
 
     /**
@@ -187,12 +177,10 @@ public class Event {
     public static void sendPageView(@NonNull String pageID,
                                     @Nullable String referrer,
                                     @Nullable String recommendationID){
-        Event event = new Event(pageID, Constant.EventType.PageView);
         EventContext context = new EventContext();
         context.referrer = referrer;
         context.contextID = recommendationID;
-        event.setContext(context);
-        PeachCollector.sendEvent(event);
+        Event.send(Constant.EventType.PageView, pageID, null, context, null);
     }
 
     /**

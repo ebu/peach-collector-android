@@ -2,7 +2,12 @@ package ch.ebu.peachcollector;
 
 public class Constant {
 
+    public static final String PEACH_LOG_NOTIFICATION = "ch.ebu.testingLog";
+    public static final String PEACH_LOG_NOTIFICATION_MESSAGE = "Message";
+    public static final String PEACH_LOG_NOTIFICATION_PAYLOAD = "Payload";
 
+    public static final String SESSION_START_TIMESTAMP_SPREF_KEY = "PeachCollectorSessionStartTimestampKey";
+    public static final String SESSION_LAST_ACTIVE_TIMESTAMP_SPREF_KEY = "PeachCollectorLastRecordedEventTimestampKey";
 
     public static final String PEACH_SCHEMA_VERSION_KEY = "peach_schema_version";
     public static final String PEACH_FRAMEWORK_VERSION_KEY = "peach_framework_version";
@@ -24,7 +29,7 @@ public class Constant {
 
     public static final String CONTEXT_ID_KEY = "id";
     public static final String CONTEXT_ITEMS_KEY = "items";
-    public static final String CONTEXT_ITEMS_DISPLAYED_KEY = "items_displayed";
+    public static final String CONTEXT_ITEM_ID_KEY = "item_id";
     public static final String CONTEXT_HIT_INDEX_KEY = "hit_index";
     public static final String CONTEXT_PAGE_URI_KEY = "page_uri";
     public static final String CONTEXT_SOURCE_KEY = "source";
@@ -66,6 +71,48 @@ public class Constant {
     public static final String OS_NAME_KEY = "name";
     public static final String OS_VERSION_KEY = "version";
 
+    public final class ClientDeviceType {
+        public static final String Phone = "phone";
+        public static final String Tablet = "tablet";
+    }
+
+    public final class Media {
+        public final class VideoMode {
+            public static final String Bar = "bar";
+            public static final String Mini = "mini";
+            public static final String Normal = "normal";
+            public static final String Wide = "wide";
+            public static final String Pip = "pip";
+            public static final String FullScreen = "fullscreen";
+            public static final String Cast = "cast";
+            public static final String Preview = "preview";
+        }
+
+        public final class AudioMode {
+            public static final String Normal = "normal";
+            public static final String Background = "background";
+            public static final String Muted = "muted";
+        }
+
+        public final class StartMode {
+            public static final String Normal = "normal";
+            public static final String AutoPlay = "auto_play";
+            public static final String AutoContinue = "auto_continue";
+        }
+
+        public final class MetadataType {
+            public static final String Audio = "audio";
+            public static final String Video = "video";
+            public static final String Article = "article";
+            public static final String Page = "page";
+        }
+
+        public final class MetadataFormat {
+            public static final String Demand = "ondemand";
+            public static final String Live = "live";
+            public static final String DVR = "dvr";
+        }
+    }
 
     public final class EventType {
         public static final String MediaPlay = "media_play"; // MEDIA
