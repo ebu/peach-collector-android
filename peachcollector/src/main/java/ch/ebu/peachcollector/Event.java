@@ -240,6 +240,20 @@ public class Event {
     }
 
     /**
+     *  Send a media stop event. Event will be added to the queue and sent accordingly to publishers' configurations.
+     *  @param mediaID Unique identifier of the media
+     *  @param properties Properties of the media and it's current state
+     *  @param context Context of the media (e. g. view where it's displayed, component used to play the media...)
+     *  @param metadata Metadatas (should be kept as small as possible)
+     */
+    public static void sendMediaEnd(@NonNull String mediaID,
+                                    @Nullable EventProperties properties,
+                                    @Nullable EventContext context,
+                                    @Nullable Map<String, Object> metadata) {
+        Event.send(Constant.EventType.MediaEnd, mediaID, properties, context, metadata);
+    }
+
+    /**
      *  Send a media heartbeat event. Event will be added to the queue and sent accordingly to publishers' configurations.
      *  @param mediaID Unique identifier of the media
      *  @param properties Properties of the media and it's current state

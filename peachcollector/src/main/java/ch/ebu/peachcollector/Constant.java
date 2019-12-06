@@ -118,11 +118,14 @@ public class Constant {
         public static final String MediaPlay = "media_play"; // MEDIA
         public static final String MediaPause = "media_pause";
         public static final String MediaStop = "media_stop";
+        public static final String MediaEnd = "media_end";
         public static final String MediaSeek = "media_seek";
         public static final String MediaVideoModeChanged = "media_video_mode_changed";
         public static final String MediaAudioModeChanged = "media_audio_mode_changed";
         public static final String MediaAudioChanged = "media_audio_changed";
         public static final String MediaHeartbeat = "media_heartbeat";
+        public static final String MediaLike = "media_like";
+        public static final String MediaShare = "media_share";
         public static final String RecommendationLoaded = "recommendation_loaded"; // RECOMMENDATION
         public static final String RecommendationHit = "recommendation_hit";
         public static final String RecommendationDisplayed = "recommendation_displayed";
