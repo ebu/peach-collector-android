@@ -68,7 +68,7 @@ public class PeachCollector {
 
 
     /**
-     * Minimum duration (in seconds) of inactivity that will cause sessionStartTimestamp to be reset when app becomes active
+     * Minimum duration (in milliseconds) of inactivity that will cause sessionStartTimestamp to be reset when app becomes active
      * Default is 1800 seconds (30 minutes)
      */
     public static long inactivityInterval = 1800000;

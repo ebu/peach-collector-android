@@ -236,6 +236,7 @@ public class Publisher {
             try{
                 URL url = new URL(serviceURL);
                 HttpURLConnection httpURLConnection = (HttpURLConnection)url.openConnection();
+                httpURLConnection.setRequestProperty("Content-Type", "application/json");
                 httpURLConnection.setRequestMethod("POST");//important
                 httpURLConnection.connect();
                 //write data to the server using BufferedWriter
