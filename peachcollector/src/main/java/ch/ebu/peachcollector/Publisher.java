@@ -10,6 +10,7 @@ import android.graphics.Point;
 import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Handler;
+import android.text.TextUtils;
 import android.util.DisplayMetrics;
 import android.view.Display;
 import android.view.WindowManager;
@@ -74,7 +75,9 @@ public class Publisher {
     public Publisher() {}
 
     public Publisher(String siteKey) {
-        serviceURL = "https://pipe-collect.ebu.io/v3/collect?s=" + siteKey;
+        if (!TextUtils.isEmpty(siteKey)) {
+            serviceURL = "https://pipe-collect.ebu.io/v3/collect?s=" + siteKey;
+        }
     }
 
     /**
@@ -84,7 +87,7 @@ public class Publisher {
      *  @return `YES` if the the publisher can process the event, `NO` otherwise.
      */
     public boolean shouldProcessEvent(Event event){
-        return true;
+        return !TextUtils.isEmpty(serviceURL);
     }
 
     public Map<String, Object> clientInfo(){
