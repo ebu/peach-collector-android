@@ -39,6 +39,8 @@ public class Constant {
     public static final String CONTEXT_COMPONENT_NAME_KEY = "name";
     public static final String CONTEXT_COMPONENT_VERSION_KEY = "version";
 
+    public static final String MEDIA_PLAYLIST_ID_KEY = "playlist_id";
+    public static final String MEDIA_INSERT_POSITION_KEY = "insert_position";
     public static final String MEDIA_TIME_SPENT_KEY = "time_spent_s";
     public static final String MEDIA_PLAYBACK_POSITION_KEY = "playback_position_s";
     public static final String MEDIA_PREVIOUS_PLAYBACK_POSITION_KEY = "previous_playback_position_s";
@@ -100,6 +102,11 @@ public class Constant {
             public static final String AutoContinue = "auto_continue";
         }
 
+        public final class InsertPosition {
+            public static final String Top = "end";
+            public static final String End = "top";
+        }
+
         public final class MetadataType {
             public static final String Audio = "audio";
             public static final String Video = "video";
@@ -123,6 +130,8 @@ public class Constant {
         public static final String MediaVideoModeChanged = "media_video_mode_changed";
         public static final String MediaAudioModeChanged = "media_audio_mode_changed";
         public static final String MediaAudioChanged = "media_audio_changed";
+        public static final String MediaPlaylistAdd = "media_playlist_add";
+        public static final String MediaPlaylistRemove = "media_playlist_remove";
         public static final String MediaHeartbeat = "media_heartbeat";
         public static final String MediaLike = "media_like";
         public static final String MediaShare = "media_share";

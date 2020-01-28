@@ -8,6 +8,18 @@ import java.util.Map;
 import static ch.ebu.peachcollector.Constant.*;
 
 public class EventProperties {
+
+    /**
+     *  The playlist ID of the playlist the media is added to or removed from
+     */
+    @Nullable public String playlistID;
+
+    /**
+     *  The position of the item in the playlist refered py `playlistID`
+     *  Can be either "top" or "end"
+     */
+    @Nullable public String insertPosition;
+
     /**
      *  The time spent by the user watching this media (in seconds)
      */
@@ -65,6 +77,8 @@ public class EventProperties {
     @Nullable
     public Map<String, Object> jsonRepresentation() {
         Map<String, Object> json = new HashMap<>();
+        if(playlistID != null) { json.put(MEDIA_PLAYLIST_ID_KEY, playlistID); }
+        if(insertPosition != null) { json.put(MEDIA_INSERT_POSITION_KEY, insertPosition); }
         if(timeSpent != null) { json.put(MEDIA_TIME_SPENT_KEY, timeSpent); }
         if(playbackPosition != null) { json.put(MEDIA_PLAYBACK_POSITION_KEY, playbackPosition); }
         if(previousPlaybackPosition != null) { json.put(MEDIA_PREVIOUS_PLAYBACK_POSITION_KEY, previousPlaybackPosition); }
