@@ -268,4 +268,33 @@ public class Event {
     }
 
 
+    /**
+     *  Send a media playlist add event. Event will be added to the queue and sent accordingly to publishers' configurations.
+     *  Properties should contain the playlist ID to which it is added and also insert position
+     *  @param mediaID Unique identifier of the media
+     *  @param properties Properties of the media and it's current state
+     *  @param context Context of the media (e. g. view where it's displayed, component used to play the media...)
+     *  @param metadata Metadatas (should be kept as small as possible)
+     */
+    public static void sendMediaPlaylistAdd(@NonNull String mediaID,
+                                            @Nullable EventProperties properties,
+                                            @Nullable EventContext context,
+                                            @Nullable Map<String, Object> metadata) {
+        Event.send(Constant.EventType.MediaPlaylistAdd, mediaID, properties, context, metadata);
+    }
+
+    /**
+     *  Send a media playlist remove event. Event will be added to the queue and sent accordingly to publishers' configurations.
+     *  Properties should contain the playlist ID from which it is removed
+     *  @param mediaID Unique identifier of the media
+     *  @param properties Properties of the media and it's current state
+     *  @param context Context of the media (e. g. view where it's displayed, component used to play the media...)
+     *  @param metadata Metadatas (should be kept as small as possible)
+     */
+    public static void sendMediaPlaylistRemove(@NonNull String mediaID,
+                                               @Nullable EventProperties properties,
+                                               @Nullable EventContext context,
+                                               @Nullable Map<String, Object> metadata) {
+        Event.send(Constant.EventType.MediaPlaylistRemove, mediaID, properties, context, metadata);
+    }
 }
