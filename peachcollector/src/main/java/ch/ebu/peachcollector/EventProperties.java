@@ -39,6 +39,12 @@ public class EventProperties {
     @Nullable public Number previousPlaybackPosition;
 
     /**
+     *  Boolean value to know if media is playing at the moment of the event
+     *  Usefull for the `media_seek` event
+     */
+    @Nullable public Boolean isPlaying;
+
+    /**
      *  In case of "auto continue" start mode, previousMediaID should be defined
      */
     @Nullable public String previousMediaID;
@@ -74,6 +80,59 @@ public class EventProperties {
     @Nullable public String startMode;
 
 
+    @Nullable private Map<String, Object> customFields;
+
+    private void addObject(String key, Object value) {
+        if (value == null) {
+            remove(key);
+            return;
+        }
+
+        if (customFields == null) {
+            customFields = new HashMap<>();
+        }
+
+        customFields.put(key, value);
+    }
+
+    /**
+     * Add a custom string field to the properties
+     */
+    public void add(String key, String value){
+        addObject(key, value);
+    }
+
+    /**
+     * Add a custom number field to the properties
+     */
+    public void add(String key, Number value){
+        addObject(key, value);
+    }
+
+    /**
+     * Add a custom boolean field to the properties
+     */
+    public void add(String key, Boolean value){
+        addObject(key, value);
+    }
+
+    /**
+     * Remove a custom field previously added
+     */
+    public void remove(String key){
+        if (customFields != null) customFields.remove(key);
+        if (customFields.size() == 0) customFields = null;
+    }
+
+    /**
+     * Retrieve a custom field previously added.
+     * @return null if the field was not found
+     */
+    @Nullable public Object get(String key){
+        if (customFields != null) return customFields.get(key);
+        return null;
+    }
+
     @Nullable
     public Map<String, Object> jsonRepresentation() {
         Map<String, Object> json = new HashMap<>();
@@ -82,12 +141,18 @@ public class EventProperties {
         if(timeSpent != null) { json.put(MEDIA_TIME_SPENT_KEY, timeSpent); }
         if(playbackPosition != null) { json.put(MEDIA_PLAYBACK_POSITION_KEY, playbackPosition); }
         if(previousPlaybackPosition != null) { json.put(MEDIA_PREVIOUS_PLAYBACK_POSITION_KEY, previousPlaybackPosition); }
+        if(isPlaying != null) { json.put(MEDIA_IS_PLAYING_KEY, isPlaying); }
         if(previousMediaID != null) { json.put(MEDIA_PREVIOUS_ID_KEY, previousMediaID); }
         if(playbackRate != null) { json.put(MEDIA_PLAYBACK_RATE_KEY, playbackRate); }
         if(volume != null) { json.put(MEDIA_VOLUME_KEY, volume); }
         if(videoMode != null) { json.put(MEDIA_VIDEO_MODE_KEY, videoMode); }
         if(audioMode != null) { json.put(MEDIA_AUDIO_MODE_KEY, audioMode); }
         if(startMode != null) { json.put(MEDIA_START_MODE_KEY, startMode); }
+        if(customFields != null) {
+            for (Map.Entry<String, Object> entry : customFields.entrySet()) {
+                json.put(entry.getKey(), entry.getValue());
+            }
+        }
         if(json.isEmpty()) return null;
         return json;
     }

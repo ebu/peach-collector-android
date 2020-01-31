@@ -28,6 +28,7 @@ public class Constant {
     public static final String EVENT_METADATA_KEY = "metadata";
 
     public static final String CONTEXT_ID_KEY = "id";
+    public static final String CONTEXT_TYPE_KEY = "type";
     public static final String CONTEXT_ITEMS_KEY = "items";
     public static final String CONTEXT_ITEM_ID_KEY = "item_id";
     public static final String CONTEXT_HIT_INDEX_KEY = "hit_index";
@@ -44,6 +45,7 @@ public class Constant {
     public static final String MEDIA_TIME_SPENT_KEY = "time_spent_s";
     public static final String MEDIA_PLAYBACK_POSITION_KEY = "playback_position_s";
     public static final String MEDIA_PREVIOUS_PLAYBACK_POSITION_KEY = "previous_playback_position_s";
+    public static final String MEDIA_IS_PLAYING_KEY = "is_playing";
     public static final String MEDIA_VIDEO_MODE_KEY = "video_mode";
     public static final String MEDIA_AUDIO_MODE_KEY = "audio_mode";
     public static final String MEDIA_START_MODE_KEY = "start_mode";
