@@ -28,6 +28,7 @@ public class Constant {
     public static final String EVENT_METADATA_KEY = "metadata";
 
     public static final String CONTEXT_ID_KEY = "id";
+    public static final String CONTEXT_TYPE_KEY = "type";
     public static final String CONTEXT_ITEMS_KEY = "items";
     public static final String CONTEXT_ITEM_ID_KEY = "item_id";
     public static final String CONTEXT_HIT_INDEX_KEY = "hit_index";
