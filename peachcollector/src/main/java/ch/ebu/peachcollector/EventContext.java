@@ -58,6 +58,59 @@ public class EventContext {
         return context;
     }
 
+    @Nullable private Map<String, Object> customFields;
+
+    private void addObject(String key, Object value) {
+        if (value == null) {
+            remove(key);
+            return;
+        }
+
+        if (customFields == null) {
+            customFields = new HashMap<>();
+        }
+
+        customFields.put(key, value);
+    }
+
+    /**
+     * Add a custom string field to the context
+     */
+    public void add(String key, String value){
+        addObject(key, value);
+    }
+
+    /**
+     * Add a custom number field to the context
+     */
+    public void add(String key, Number value){
+        addObject(key, value);
+    }
+
+    /**
+     * Add a custom boolean field to the context
+     */
+    public void add(String key, Boolean value){
+        addObject(key, value);
+    }
+
+    /**
+     * Remove a custom field previously added
+     */
+    public void remove(String key){
+        if (customFields != null) customFields.remove(key);
+        if (customFields.size() == 0) customFields = null;
+    }
+
+    /**
+     * Retrieve a custom field previously added.
+     * @return null if the field was not found
+     */
+    @Nullable public Object get(String key){
+        if (customFields != null) return customFields.get(key);
+        return null;
+    }
+
     @Nullable
     Map<String, Object> jsonRepresentation() {
         Map<String, Object> json = new HashMap<>();
@@ -71,6 +124,11 @@ public class EventContext {
         if(referrer != null) { json.put(CONTEXT_REFERRER_KEY, referrer); }
         if(component != null && component.jsonRepresentation() != null) {
             json.put(CONTEXT_COMPONENT_KEY, component.jsonRepresentation());
+        }
+        if(customFields != null) {
+            for (Map.Entry<String, Object> entry : customFields.entrySet()) {
+                json.put(entry.getKey(), entry.getValue());
+            }
         }
         if (json.isEmpty()) return null;
         return json;
