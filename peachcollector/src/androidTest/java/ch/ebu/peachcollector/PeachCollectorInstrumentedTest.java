@@ -220,13 +220,15 @@ public class PeachCollectorInstrumentedTest{
         carouselComponent.name = "bottomPlayer";
         carouselComponent.version = "1.0";
 
-        EventContext eventContext = EventContext.mediaContext("reco00", null, null, carouselComponent);
+        EventContext eventContext = EventContext.mediaContext("reco00", "playlist", null, null, carouselComponent);
+        eventContext.add("testKey", "testValue");
 
         EventProperties props = new EventProperties();
         props.audioMode = Constant.Media.AudioMode.Normal;
         props.playbackPosition = 10;
         props.previousPlaybackPosition = 5;
         props.startMode = Constant.Media.StartMode.Normal;
+        props.isPlaying = false;
 
         currentEventType = "mediaSeek";
         Event.sendMediaSeek("media01", props, eventContext, null);
@@ -346,12 +348,15 @@ public class PeachCollectorInstrumentedTest{
 
                             JSONObject eventContext = event.getJSONObject("context");
                             assertEquals("reco00", eventContext.getString("id"));
+                            assertEquals("playlist", eventContext.getString("type"));
+                            assertEquals("testValue", eventContext.getString("testKey"));
 
                             JSONObject eventProps = event.getJSONObject("props");
                             assertEquals(5, eventProps.getLong("previous_playback_position_s"));
                             assertEquals(10, eventProps.getLong("playback_position_s"));
                             assertEquals("normal", eventProps.getString("start_mode"));
                             assertEquals("normal", eventProps.getString("audio_mode"));
+                            assertFalse(eventProps.getBoolean("is_playing"));
 
                             JSONObject component = eventContext.getJSONObject("component");
                             assertEquals("bottomPlayer", component.getString("name"));
