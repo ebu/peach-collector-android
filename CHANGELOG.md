@@ -2,6 +2,13 @@
 # Change Log
 All notable changes to this project will be documented in this file.
 
+## [1.0.4] - 2020-01-31
+
+### Added
+- **`isPlaying`** field in `EventProperties`, for media_seek events
+- **`type`**  field in `EventContext`
+- possibility to add, retrieve and remove custom fields from `EventProperties` and `EventContext`
+
 
 ## [1.0.3] - 2020-01-28
 
