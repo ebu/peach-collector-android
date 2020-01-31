@@ -39,6 +39,12 @@ public class EventProperties {
     @Nullable public Number previousPlaybackPosition;
 
     /**
+     *  Boolean value to know if media is playing at the moment of the event
+     *  Usefull for the `media_seek` event
+     */
+    @Nullable public Boolean isPlaying;
+
+    /**
      *  In case of "auto continue" start mode, previousMediaID should be defined
      */
     @Nullable public String previousMediaID;
@@ -82,6 +88,7 @@ public class EventProperties {
         if(timeSpent != null) { json.put(MEDIA_TIME_SPENT_KEY, timeSpent); }
         if(playbackPosition != null) { json.put(MEDIA_PLAYBACK_POSITION_KEY, playbackPosition); }
         if(previousPlaybackPosition != null) { json.put(MEDIA_PREVIOUS_PLAYBACK_POSITION_KEY, previousPlaybackPosition); }
+        if(isPlaying != null) { json.put(MEDIA_IS_PLAYING_KEY, isPlaying); }
         if(previousMediaID != null) { json.put(MEDIA_PREVIOUS_ID_KEY, previousMediaID); }
         if(playbackRate != null) { json.put(MEDIA_PLAYBACK_RATE_KEY, playbackRate); }
         if(volume != null) { json.put(MEDIA_VOLUME_KEY, volume); }

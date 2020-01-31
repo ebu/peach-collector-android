@@ -45,6 +45,7 @@ public class Constant {
     public static final String MEDIA_TIME_SPENT_KEY = "time_spent_s";
     public static final String MEDIA_PLAYBACK_POSITION_KEY = "playback_position_s";
     public static final String MEDIA_PREVIOUS_PLAYBACK_POSITION_KEY = "previous_playback_position_s";
+    public static final String MEDIA_IS_PLAYING_KEY = "is_playing";
     public static final String MEDIA_VIDEO_MODE_KEY = "video_mode";
     public static final String MEDIA_AUDIO_MODE_KEY = "audio_mode";
     public static final String MEDIA_START_MODE_KEY = "start_mode";
