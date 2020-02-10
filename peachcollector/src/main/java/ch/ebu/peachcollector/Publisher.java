@@ -15,7 +15,7 @@ import android.util.DisplayMetrics;
 import android.view.Display;
 import android.view.WindowManager;
 
-import org.json.JSONObject;
+import com.google.gson.Gson;
 
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
@@ -210,16 +210,17 @@ public class Publisher {
             map.put(USER_ID_KEY, PeachCollector.userID);
         }
 
-        JSONObject obj=new JSONObject(map);
+        Gson gson = new Gson();
+        String obj = gson.toJson(map);
 
         if (PeachCollector.isUnitTesting) {
             Intent intent = new Intent();
             intent.setAction(PEACH_LOG_NOTIFICATION);
-            intent.putExtra(PEACH_LOG_NOTIFICATION_PAYLOAD, obj.toString());
+            intent.putExtra(PEACH_LOG_NOTIFICATION_PAYLOAD, obj);
             PeachCollector.getApplicationContext().sendBroadcast(intent);
         }
 
-        new PostTask(finishHandler).execute(obj.toString());
+        new PostTask(finishHandler).execute(obj);
     }
 
 
