@@ -239,7 +239,29 @@ public class PeachCollectorInstrumentedTest{
     }
 
 
+    @Test
+    public void testMaxEvents() throws InterruptedException {
+        Publisher publisher = PeachCollector.sharedCollector.publishers.get(PUBLISHER_NAME);
+        publisher.serviceURL = "";
+        publisher.interval = 1;
+        publisher.maxEventsPerBatch = 100;
 
+        for (int i=0; i<1000; i++) {
+            Event.sendPageView("page00"+i, null, "reco00");
+        }
+
+        int b = mReceiver.publishedEventsCount;
+        assertEquals(0, b);
+
+        PeachCollector.sharedCollector.checkStoredEvents();
+        Thread.sleep(1000);
+
+        publisher.serviceURL = "https://pipe-collect.ebu.io/v3/collect?s=zzebu00000000017";
+        Thread.sleep(10000);
+        b = mReceiver.publishedEventsCount;
+        assertEquals("The right number of events was sent (500)", 500, b);
+
+    }
 
 
     public class LogReceiver extends BroadcastReceiver {
