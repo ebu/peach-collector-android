@@ -47,12 +47,17 @@ PeachCollector.addPublisher(publisher, "My Publisher");
 - The collector retrieves the *Advertising ID* to set as the *device ID* in order to track users that do not have user IDs. People can choose to limit tracking on their devices and the Advertising ID will not be available anymore. In this case, if there is no **`userID`** defined, no events will be recorder or sent. Unless you set the **`shouldCollectAnonymousEvents`** flag to *true*. Default is *false*.
 - Optionally, you can define an **`implementationVersion`** (that will be added to the request's payload).
 - `inactivityInterval` is the minimum duration (in milliseconds) of inactivity that will cause the `sessionStartTimestamp` to be reset when app becomes active (default is 1800000 milliseconds, half an hour)
+- `maximumStorageDays` is the maximum number of days an event should be kept in the queue (if it could not be sent).
+- `maximumStoredEvents` is the maximum number of events that should be kept in the queue. 
+`maximumStorageDays` and `maximumStoredEvents` should be set before the initialisation of the framework as it will be used to clean the queue during the initialisation.
 ```java
 PeachCollector.isUnitTesting = true;
 PeachCollector.shouldCollectAnonymousEvents = true;
 PeachCollector.userID = "123e4567-e89b-12d3-a456-426655440000";
 PeachCollector.implementationVersion = "1";
 PeachCollector.inactivityInterval = 3600000;
+PeachCollector.maximumStorageDays = 5;
+PeachCollector.maximumStoredEvents = 1000;
 ```
 
 ### Configuring a Publisher
