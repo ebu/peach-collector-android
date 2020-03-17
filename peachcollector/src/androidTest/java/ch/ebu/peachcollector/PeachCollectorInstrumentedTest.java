@@ -244,23 +244,26 @@ public class PeachCollectorInstrumentedTest{
         Publisher publisher = PeachCollector.sharedCollector.publishers.get(PUBLISHER_NAME);
         publisher.serviceURL = "";
         publisher.interval = 1;
-        publisher.maxEventsPerBatch = 100;
+        publisher.maxEventsPerBatch = 1000;
 
         for (int i=0; i<1000; i++) {
-            Event.sendPageView("page00"+i, null, "reco00");
+            Event.sendPageView("page"+i, null, "reco00");
         }
 
         int b = mReceiver.publishedEventsCount;
         assertEquals(0, b);
 
+        PeachCollector.maximumStoredEvents = 500;
         PeachCollector.sharedCollector.checkStoredEvents();
         Thread.sleep(1000);
 
+        currentEventType = "pageViewMax";
         publisher.serviceURL = "https://pipe-collect.ebu.io/v3/collect?s=zzebu00000000017";
         Thread.sleep(10000);
         b = mReceiver.publishedEventsCount;
+        boolean test = mReceiver.testMaxSuccess;
         assertEquals("The right number of events was sent (500)", 500, b);
-
+        assertTrue(test);
     }
 
 
@@ -275,6 +278,9 @@ public class PeachCollectorInstrumentedTest{
         // test4
         int publishedEventsCount2 = 0;
         int publishedEventsCount3 = 0;
+
+        // testMax
+        boolean testMaxSuccess;
 
         public LogReceiver() {
         }
@@ -324,6 +330,8 @@ public class PeachCollectorInstrumentedTest{
                             assertEquals("recoCarousel", component.getString("name"));
                             assertEquals("Carousel", component.getString("type"));
                             assertEquals("1.0", component.getString("version"));
+
+                            if ()
                         }
                     } catch (JSONException e) {
                         e.printStackTrace();
@@ -390,6 +398,21 @@ public class PeachCollectorInstrumentedTest{
                         e.printStackTrace();
                     }
                     Log.e("PEACH COLLECTOR", payload);
+                }
+                else if(currentEventType.equalsIgnoreCase("pageViewMax")){
+                    try {
+                        JSONObject json = new JSONObject(payload);
+                        JSONArray jArray = json.getJSONArray("events");
+                        assertEquals(jArray.length(), 1);
+                        for (int i = 0; i < jArray.length(); i++) {
+                            JSONObject event = jArray.getJSONObject(i);
+                            if(event.getString("id").equalsIgnoreCase("page800")) {
+                                testMaxSuccess = true;
+                            }
+                        }
+                    } catch (JSONException e) {
+                        e.printStackTrace();
+                    }
                 }
 
 
