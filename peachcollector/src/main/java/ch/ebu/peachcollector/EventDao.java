@@ -21,6 +21,11 @@ public interface EventDao {
     @Query("SELECT * from Event ORDER BY id ASC")
     List<Event> getAllEvents();
 
+    @Query("DELETE FROM Event WHERE id IN (SELECT id FROM Event ORDER BY id DESC LIMIT :limit OFFSET :offset)")
+    void deleteEvents(int limit, int offset);
+
+    @Query("DELETE FROM Event WHERE creationDate < :dateLimit")
+    void deleteEvents(long dateLimit);
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     void insert(EventStatus event);

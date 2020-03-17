@@ -78,6 +78,17 @@ public class PeachCollector {
      */
     public static long sessionStartTimestamp;
 
+    /**
+     * Maximum duration (in days) of storage for an event (should be changed before init)
+     * Default is 30 days
+     */
+    public static int maximumStorageDays = 30;
+
+    /**
+     * Maximum duration (in days) of storage for an event (should be changed before init)
+     * Default is 30 days
+     */
+    public static int maximumStoredEvents = 5000;
 
     /**
      * Timestamp of the start of the session
@@ -125,6 +136,7 @@ public class PeachCollector {
                     sharedCollector.handlerThread = new HandlerThread("PeachCollectorPostHandler");
                     sharedCollector.handlerThread.start(); //should call quit() onDestroy of activity ? sharedCollector.handlerThread.quit()
                     sharedCollector.application.registerActivityLifecycleCallbacks(sharedCollector.lifecycleHandler);
+                    sharedCollector.checkStoredEvents();
                 }
             }
         }
@@ -196,6 +208,16 @@ public class PeachCollector {
                     status.setStatus(0);
                     database.peachCollectorEventDao().update(status);
                 }
+            }
+        });
+    }
+
+    void checkStoredEvents(){
+        dbExecutor.execute(new Runnable() {
+            @Override
+            public void run() {
+                database.peachCollectorEventDao().deleteEvents(Integer.MAX_VALUE, maximumStoredEvents);
+                database.peachCollectorEventDao().deleteEvents((new Date()).getTime() - (maximumStorageDays * 60 * 60 * 24));
             }
         });
     }
