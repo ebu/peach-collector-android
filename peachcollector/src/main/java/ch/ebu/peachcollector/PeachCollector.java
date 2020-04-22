@@ -158,6 +158,7 @@ public class PeachCollector {
 
     public static void sendEvent(final Event event) {
         if (shouldCollectAnonymousEvents || !limitedTrackingEnabled || userID != null) {
+            if (sharedCollector == null || sharedCollector.dbExecutor == null) return;
             sharedCollector.dbExecutor.execute(new Runnable() {
                 @Override
                 public void run() {
@@ -192,6 +193,7 @@ public class PeachCollector {
      *  @param publisherName The unique name of the publisher.
      */
     public static void addPublisher(Publisher publisher, String publisherName) {
+        if (sharedCollector == null || sharedCollector.dbExecutor == null) return;
         sharedCollector.publishers.put(publisherName, publisher);
         // in case of a crash while sending events, reset related events statuses
         sharedCollector.resetPublisherStatuses(publisherName);
@@ -223,6 +225,7 @@ public class PeachCollector {
     }
 
     public static void clean() {
+        if (sharedCollector == null || sharedCollector.dbExecutor == null) return;
         sharedCollector.cleanTimers();
         sharedCollector.dbExecutor.execute(new Runnable() {
             @Override
@@ -233,6 +236,7 @@ public class PeachCollector {
     }
 
     public static void flush() {
+        if (sharedCollector == null || sharedCollector.dbExecutor == null) return;
         for (String publisherName : sharedCollector.publishers.keySet()) {
             sharedCollector.sendEventsToPublisher(publisherName);
         }
