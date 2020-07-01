@@ -230,6 +230,8 @@ public class PeachCollectorInstrumentedTest{
         props.previousPlaybackPosition = 5;
         props.startMode = Constant.Media.StartMode.Normal;
         props.isPlaying = false;
+        String test = null;
+        props.add("testProperty", test);
 
         currentEventType = "mediaSeek";
         Event.sendMediaSeek("media01", props, eventContext, null);
@@ -330,8 +332,6 @@ public class PeachCollectorInstrumentedTest{
                             assertEquals("recoCarousel", component.getString("name"));
                             assertEquals("Carousel", component.getString("type"));
                             assertEquals("1.0", component.getString("version"));
-
-                            if ()
                         }
                     } catch (JSONException e) {
                         e.printStackTrace();
