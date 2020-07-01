@@ -98,8 +98,10 @@ public class EventContext {
      * Remove a custom field previously added
      */
     public void remove(String key){
-        if (customFields != null) customFields.remove(key);
-        if (customFields.size() == 0) customFields = null;
+        if (customFields != null && customFields.containsKey(key)){
+            customFields.remove(key);
+            if (customFields.size() == 0) customFields = null;
+        }
     }
 
     /**
