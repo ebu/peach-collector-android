@@ -122,6 +122,7 @@ public class Publisher {
         if (applicationName.length() == 0) applicationName = "unknown";
         clientInfo.put(CLIENT_APP_NAME_KEY, applicationName);
         clientInfo.put(CLIENT_ID_KEY, PeachCollector.getDeviceID());
+        clientInfo.put(CLIENT_USER_IS_LOGGED_IN_KEY, PeachCollector.userIsLoggedIn);
 
         clientInfo.put(DEVICE_KEY, deviceInfo());
         clientInfo.put(OS_KEY, osInfo());
