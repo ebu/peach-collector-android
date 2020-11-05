@@ -62,6 +62,7 @@ public class Constant {
     public static final String CLIENT_APP_ID_KEY = "app_id";
     public static final String CLIENT_APP_NAME_KEY = "name";
     public static final String CLIENT_APP_VERSION_KEY = "version";
+    public static final String CLIENT_USER_IS_LOGGED_IN_KEY = "user_logged_in";
 
     public static final String DEVICE_KEY = "device";
     public static final String DEVICE_TYPE_KEY = "type";
