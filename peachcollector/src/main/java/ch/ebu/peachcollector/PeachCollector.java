@@ -51,6 +51,11 @@ public class PeachCollector {
     public static String userID;
 
     /**
+     *  Define if the user is logged in (userID can be defined for anonymous users)
+     */
+    public static Boolean userIsLoggedIn;
+
+    /**
      *  The Device ID used by the framework is the Advertising ID provided by Apple.
      *  This ID can be reseted or even null. If the Advertising Id is null and the user is not logged in,
      *  collecting of the events should be stopped unless if it is needed for anonymous analytics.

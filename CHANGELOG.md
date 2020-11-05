@@ -2,7 +2,22 @@
 # Change Log
 All notable changes to this project will be documented in this file.
 
-## [1.0.5] - 2020-03-16
+## [1.0.9] - 2020-11-05
+
+### Added
+- `userIsLoggedIn` flag in `PeachCollector` to help when userIDs are generated automatically for anonymous users
+
+## [1.0.8] - 2020-07-01
+
+### Fixed
+- Exception when first custom field added is null (in EventProperties and EventContext)
+
+## [1.0.7] - 2020-04-22
+
+### Added
+- Fallbacks for when `PeachCollector` is not initialised
+
+## [1.0.6] - 2020-03-16
 
 ### Added
 - **`maximumStoredEvents`** field in `PeachCollector` to limit queue size

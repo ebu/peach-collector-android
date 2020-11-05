@@ -54,6 +54,7 @@ public class PeachCollectorInstrumentedTest{
 
         PeachCollector.isUnitTesting = true;
         PeachCollector.shouldCollectAnonymousEvents = true;
+        PeachCollector.userIsLoggedIn = true;
         Application app = (Application) mContext.getApplicationContext();
         PeachCollector.init(app);
         PeachCollector.clean();
@@ -315,6 +316,8 @@ public class PeachCollectorInstrumentedTest{
                 if (currentEventType.equalsIgnoreCase("recommendationHit")){
                     try {
                         JSONObject json = new JSONObject(payload);
+                        JSONObject client = json.getJSONObject("client");
+                        assertTrue(client.getBoolean("user_logged_in"));
                         JSONArray jArray = json.getJSONArray("events");
                         assertEquals(jArray.length(), 1);
                         for (int i = 0; i < jArray.length(); i++) {
