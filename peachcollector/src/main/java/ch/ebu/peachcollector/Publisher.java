@@ -95,7 +95,11 @@ public class Publisher {
         clientInfo = new HashMap<>();
 
         Context appContext = PeachCollector.getApplicationContext();
-        String packageName = appContext.getPackageName();
+
+        String packageName = PeachCollector.appID;
+        if (packageName == null) {
+            packageName = appContext.getPackageName();
+        }
         if (packageName == null) packageName = "unknown";
         clientInfo.put(CLIENT_APP_ID_KEY, packageName);
         clientInfo.put(CLIENT_TYPE_KEY, "mobileapp");

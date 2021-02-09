@@ -2,6 +2,11 @@
 # Change Log
 All notable changes to this project will be documented in this file.
 
+## [1.0.10] - 2021-02-05
+
+### Added
+- `appID` can be defined in the `PeachCollector`. The default value is the Package Name of your app.
+
 ## [1.0.9] - 2020-11-05
 
 ### Added
