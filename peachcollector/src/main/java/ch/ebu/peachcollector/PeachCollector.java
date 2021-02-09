@@ -51,6 +51,11 @@ public class PeachCollector {
     public static String userID;
 
     /**
+     *  Optional App ID that will be sent in the `client` payload. The default value is the Package Name of the app
+     */
+    public static String appID;
+
+    /**
      *  Define if the user is logged in (userID can be defined for anonymous users)
      */
     public static Boolean userIsLoggedIn;

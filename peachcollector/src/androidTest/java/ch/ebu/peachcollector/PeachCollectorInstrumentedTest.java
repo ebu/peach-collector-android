@@ -96,6 +96,19 @@ public class PeachCollectorInstrumentedTest{
         assertTrue("The right number of events was sent",b);
     }
 
+    @Test
+    public void testAppID() throws InterruptedException {
+        Publisher publisher = PeachCollector.sharedCollector.publishers.get(PUBLISHER_NAME);
+        publisher.interval = 1;
+        publisher.maxEventsPerBatch = 1;
+        PeachCollector.appID = "test.app";
+        currentEventType = "pageView";
+        Event.sendPageView("page001", null, "reco00");
+
+        Thread.sleep(2000);
+        boolean b = mReceiver.testAppIDsuccess;
+        assertTrue("The custom app ID was set", b);
+    }
 
 
     @Test
@@ -247,25 +260,25 @@ public class PeachCollectorInstrumentedTest{
         Publisher publisher = PeachCollector.sharedCollector.publishers.get(PUBLISHER_NAME);
         publisher.serviceURL = "";
         publisher.interval = 1;
-        publisher.maxEventsPerBatch = 1000;
+        publisher.maxEventsPerBatch = 500;
 
-        for (int i=0; i<1000; i++) {
+        for (int i=0; i<500; i++) {
             Event.sendPageView("page"+i, null, "reco00");
         }
 
         int b = mReceiver.publishedEventsCount;
         assertEquals(0, b);
 
-        PeachCollector.maximumStoredEvents = 500;
+        PeachCollector.maximumStoredEvents = 250;
         PeachCollector.sharedCollector.checkStoredEvents();
         Thread.sleep(1000);
 
         currentEventType = "pageViewMax";
         publisher.serviceURL = "https://pipe-collect.ebu.io/v3/collect?s=zzebu00000000017";
-        Thread.sleep(10000);
+        Thread.sleep(30000);
         b = mReceiver.publishedEventsCount;
         boolean test = mReceiver.testMaxSuccess;
-        assertEquals("The right number of events was sent (500)", 500, b);
+        assertEquals("The right number of events was sent (250)", 250, b);
         assertTrue(test);
     }
 
@@ -284,6 +297,9 @@ public class PeachCollectorInstrumentedTest{
 
         // testMax
         boolean testMaxSuccess;
+
+        // testAppID
+        boolean testAppIDsuccess;
 
         public LogReceiver() {
         }
@@ -406,12 +422,23 @@ public class PeachCollectorInstrumentedTest{
                     try {
                         JSONObject json = new JSONObject(payload);
                         JSONArray jArray = json.getJSONArray("events");
-                        assertEquals(jArray.length(), 1);
+                        assertEquals(jArray.length(), 250);
                         for (int i = 0; i < jArray.length(); i++) {
                             JSONObject event = jArray.getJSONObject(i);
-                            if(event.getString("id").equalsIgnoreCase("page800")) {
+                            if(event.getString("id").equalsIgnoreCase("page400")) {
                                 testMaxSuccess = true;
                             }
+                        }
+                    } catch (JSONException e) {
+                        e.printStackTrace();
+                    }
+                }
+                else if(currentEventType.equalsIgnoreCase("pageView")){
+                    try {
+                        JSONObject json = new JSONObject(payload);
+                        JSONObject client = json.getJSONObject("client");
+                        if (client.getString("app_id").equalsIgnoreCase("test.app")) {
+                            testAppIDsuccess = true;
                         }
                     } catch (JSONException e) {
                         e.printStackTrace();

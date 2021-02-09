@@ -51,6 +51,7 @@ PeachCollector.addPublisher(publisher, "My Publisher");
 - `maximumStorageDays` is the maximum number of days an event should be kept in the queue (if it could not be sent).
 - `maximumStoredEvents` is the maximum number of events that should be kept in the queue. 
 `maximumStorageDays` and `maximumStoredEvents` should be set before the initialisation of the framework as it will be used to clean the queue during the initialisation.
+- An `appID` can be defined if you don't want to use the default value (which is the bundle ID of the app).
 ```java
 PeachCollector.isUnitTesting = true;
 PeachCollector.shouldCollectAnonymousEvents = true;
@@ -59,6 +60,7 @@ PeachCollector.implementationVersion = "1";
 PeachCollector.inactivityInterval = 3600000;
 PeachCollector.maximumStorageDays = 5;
 PeachCollector.maximumStoredEvents = 1000;
+PeachCollector.appID = "my.test.app";
 ```
 
 ### Configuring a Publisher
