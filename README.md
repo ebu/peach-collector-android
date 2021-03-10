@@ -1,5 +1,5 @@
 
-[![](https://jitpack.io/v/bkhezry/MapDrawingTools.svg)](https://jitpack.io/#bkhezry/MapDrawingTools)
+[![](https://jitpack.io/v/ebu/peach-collector-android.svg)](https://jitpack.io/#ebu/peach-collector-android)
 # About
 
 The **Peach Collector** module provides simple functionalities to facilitate the collect of events. `PeachCollector` helps you by managing a queue of events serialized until they are successfully published.
