@@ -43,6 +43,7 @@ PeachCollector.addPublisher(publisher, "My Publisher");
 ## Configuring the collector
 
 - A user ID can be defined using the **`userID`** PeachCollector property.
+- A device ID can be defined using the **`setUserID`** function in PeachCollector. If set before initialization, PeachCollector will not try to retrieve an Advertising ID.
 - If userIDs are generated automatically for anonymous user. You can use the `userIsLoggedIn` flag to define if the user is logged in or not
 - For debugging purpose, a **`isUnitTesting`** flag is available. If true, notifications will be sent by the collector (see `PEACH_LOG_NOTIFICATION` constants)
 - The collector retrieves the *Advertising ID* to set as the *device ID* in order to track users that do not have user IDs. People can choose to limit tracking on their devices and the Advertising ID will not be available anymore. In this case, if there is no **`userID`** defined, no events will be recorder or sent. Unless you set the **`shouldCollectAnonymousEvents`** flag to *true*. Default is *false*.
@@ -54,6 +55,7 @@ PeachCollector.addPublisher(publisher, "My Publisher");
 - An `appID` can be defined if you don't want to use the default value (which is the bundle ID of the app).
 ```java
 PeachCollector.isUnitTesting = true;
+PeachCollector.setDeviceID(UUID.randomUUID().toString());
 PeachCollector.shouldCollectAnonymousEvents = true;
 PeachCollector.userID = "123e4567-e89b-12d3-a456-426655440000";
 PeachCollector.implementationVersion = "1";

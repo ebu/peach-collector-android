@@ -16,6 +16,7 @@ import android.view.View;
 import android.widget.TextView;
 
 import java.util.List;
+import java.util.UUID;
 
 import ch.ebu.peachcollector.Event;
 import ch.ebu.peachcollector.PeachCollector;
@@ -85,6 +86,7 @@ public class MainActivity extends AppCompatActivity {
         publisher2Config = findViewById(R.id.publisher2_config);
         publisher2Count = findViewById(R.id.publisher2_count);
 
+        PeachCollector.setDeviceID(UUID.randomUUID().toString());
         PeachCollector.isUnitTesting = true;
         PeachCollector.shouldCollectAnonymousEvents = true;
         PeachCollector.init(getApplication());
