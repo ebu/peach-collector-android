@@ -2,6 +2,11 @@
 # Change Log
 All notable changes to this project will be documented in this file.
 
+## [1.0.11] - 2021-03-25
+
+### Added
+- `setDeviceID` function in the `PeachCollector`. If deviceID is set before initialization, PeachCollector will not try to retrieve the advertising ID.
+
 ## [1.0.10] - 2021-02-05
 
 ### Added

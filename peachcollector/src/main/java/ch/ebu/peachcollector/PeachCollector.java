@@ -109,30 +109,32 @@ public class PeachCollector {
         applicationContext = application.getApplicationContext();
 
         sessionStartTimestamp = (new Date()).getTime();
-        new Thread(new Runnable() {
-            public void run() {
-                try {
-                    AdvertisingIdClient.AdInfo adInfo = AdvertisingIdClient.getAdvertisingIdInfo(applicationContext);
-                    limitedTrackingEnabled = adInfo.isLimitAdTrackingEnabled();
-                    if (!limitedTrackingEnabled){
-                        deviceID = adInfo.getId();
-                        if (deviceID == null) {
-                            SharedPreferences sPrefs= applicationContext.getSharedPreferences("PeachCollector", MODE_PRIVATE);
-                            deviceID = sPrefs.getString("device_id",null);
-
+        if (deviceID == null) {
+            new Thread(new Runnable() {
+                public void run() {
+                    try {
+                        AdvertisingIdClient.AdInfo adInfo = AdvertisingIdClient.getAdvertisingIdInfo(applicationContext);
+                        limitedTrackingEnabled = adInfo.isLimitAdTrackingEnabled();
+                        if (!limitedTrackingEnabled) {
+                            deviceID = adInfo.getId();
                             if (deviceID == null) {
-                                deviceID = UUID.randomUUID().toString();
+                                SharedPreferences sPrefs = applicationContext.getSharedPreferences("PeachCollector", MODE_PRIVATE);
+                                deviceID = sPrefs.getString("device_id", null);
+
+                                if (deviceID == null) {
+                                    deviceID = UUID.randomUUID().toString();
+                                }
+                                SharedPreferences.Editor editor = sPrefs.edit();
+                                editor.putString("device_id", deviceID);
+                                editor.apply();
                             }
-                            SharedPreferences.Editor editor = sPrefs.edit();
-                            editor.putString("device_id", deviceID);
-                            editor.apply();
                         }
+                    } catch (Exception e) {
+                        e.printStackTrace();
                     }
-                } catch (Exception e) {
-                    e.printStackTrace();
                 }
-            }
-        }).start();
+            }).start();
+        }
 
         if (sharedCollector == null) {
             synchronized (RoomDatabase.class) {
@@ -155,6 +157,13 @@ public class PeachCollector {
 
     protected static Context getApplicationContext() {
         return applicationContext;
+    }
+
+    /**
+     *  Define the device unique identifier (will prevent the framework from retrieving the advertising identifier)
+     */
+    public static void setDeviceID(String id){
+        deviceID = id;
     }
 
     /**
