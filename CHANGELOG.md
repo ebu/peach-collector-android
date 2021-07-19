@@ -2,6 +2,12 @@
 # Change Log
 All notable changes to this project will be documented in this file.
 
+## [1.0.12] - 2021-07-19
+
+### Added
+- `collectionLoaded`, `collectionDisplayed` and `collectionHit` events with a specific collection context.
+
+
 ## [1.0.11] - 2021-03-25
 
 ### Added
