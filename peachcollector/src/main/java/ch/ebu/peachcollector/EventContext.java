@@ -19,6 +19,38 @@ public class EventContext {
     @Nullable String source;
     @Nullable String referrer;
     @Nullable EventContextComponent component;
+    @Nullable String experimentID;
+    @Nullable String experimentComponent;
+
+    public static EventContext collectionContext(@Nullable List<String> items,
+                                                 @Nullable String appSectionID,
+                                                 @Nullable String source,
+                                                 @Nullable EventContextComponent component,
+                                                 @Nullable Number hitIndex,
+                                                 @Nullable String itemID,
+                                                 @Nullable String experimentID,
+                                                 @Nullable String experimentComponent){
+        EventContext context = new EventContext();
+        context.items = items;
+        context.appSectionID = appSectionID;
+        context.source = source;
+        context.component = component;
+        context.hitIndex = hitIndex;
+        context.itemID = itemID;
+        if (experimentID != null) {
+            context.experimentID = experimentID;
+        }
+        else {
+            context.experimentID = "default";
+        }
+        if (experimentComponent != null) {
+            context.experimentComponent = experimentComponent;
+        }
+        else {
+            context.experimentComponent = "main";
+        }
+        return context;
+    }
 
     public static EventContext recommendationContext(@Nullable List<String> items,
                                                      @Nullable String appSectionID,
@@ -127,6 +159,8 @@ public class EventContext {
         if(component != null && component.jsonRepresentation() != null) {
             json.put(CONTEXT_COMPONENT_KEY, component.jsonRepresentation());
         }
+        if(experimentID != null) { json.put(CONTEXT_EXPERIMENT_ID_KEY, experimentID); }
+        if(experimentComponent != null) { json.put(CONTEXT_EXPERIMENT_COMPONENT_KEY, experimentComponent); }
         if(customFields != null) {
             for (Map.Entry<String, Object> entry : customFields.entrySet()) {
                 json.put(entry.getKey(), entry.getValue());

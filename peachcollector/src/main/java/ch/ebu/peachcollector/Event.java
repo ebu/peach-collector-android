@@ -100,7 +100,7 @@ public class Event {
      *  @param eventID unique identifier related to the event (e.g., data source id for a recommendation hit, media id for a media play)
      *  @param properties optional properties related to the event
      *  @param context optional context of the event (usually contains a component, e.g. Carousel, VideoPlayer...)
-     *  @param metadata optional dictionary of metadatas (should be kept as small as possible)
+     *  @param metadata optional dictionary of metadata (should be kept as small as possible)
      */
     public static void send(@NonNull String type,
                             @NonNull String eventID,
@@ -113,6 +113,72 @@ public class Event {
         event.mMetadata = metadata;
         PeachCollector.sendEvent(event);
     }
+
+    /**
+     *  Send a collection hit event. Event will be added to the queue and sent accordingly to publishers' configurations.
+     *  @param collectionID Unique identifier of the collection.
+     *  @param itemID Unique identifier for the clip, media or article hit
+     *  @param hitIndex Index of the item that has been hit
+     *  @param appSectionID Unique identifier of app section where the recommendation is displayed
+     *  @param source Identifier of the element in which the recommendation is displayed (the module, view or popup)
+     *  @param component Description of the element in which the recommendation is displayed
+     *  @param experimentID Experiment identifier (default value is "default")
+     *  @param experimentComponent Component of the experiment (default value is "main")
+     */
+    public static void sendCollectionHit(@NonNull String collectionID,
+                                         @NonNull String itemID,
+                                         @NonNull Number hitIndex,
+                                         @Nullable String appSectionID,
+                                         @Nullable String source,
+                                         @Nullable EventContextComponent component,
+                                         @Nullable String experimentID,
+                                         @Nullable String experimentComponent){
+        EventContext context = EventContext.collectionContext(null, appSectionID, source, component, hitIndex, itemID, experimentID, experimentComponent);
+        Event.send(Constant.EventType.CollectionHit, collectionID, null, context, null);
+    }
+
+    /**
+     *  Send a collection displayed event. Event will be added to the queue and sent accordingly to publishers' configurations.
+     *  @param collectionID Unique identifier of the collection.
+     *  @param itemsDisplayed List of unique identifiers for the clips, medias or articles show/displayed
+     *  @param appSectionID Unique identifier of app section where the recommendation is displayed
+     *  @param source Identifier of the element in which the recommendation is displayed (the module, view or popup)
+     *  @param component Description of the element in which the recommendation is displayed
+     *  @param experimentID Experiment identifier (default value is "default")
+     *  @param experimentComponent Component of the experiment (default value is "main")
+     */
+    public static void sendCollectionDisplayed(@NonNull String collectionID,
+                                               @NonNull List<String> itemsDisplayed,
+                                               @Nullable String appSectionID,
+                                               @Nullable String source,
+                                               @Nullable EventContextComponent component,
+                                               @Nullable String experimentID,
+                                               @Nullable String experimentComponent) {
+        EventContext context = EventContext.collectionContext(itemsDisplayed, appSectionID, source, component, null, null, experimentID, experimentComponent);
+        Event.send(Constant.EventType.CollectionDisplayed, collectionID, null, context, null);
+    }
+
+    /**
+     *  Send a collection loaded event. Event will be added to the queue and sent accordingly to publishers' configurations.
+     *  @param collectionID Unique identifier of the collection.
+     *  @param items List of unique identifiers for the clips, medias or articles recommended
+     *  @param appSectionID Unique identifier of app section where the recommendation is displayed
+     *  @param source Identifier of the element in which the recommendation is displayed (the module, view or popup)
+     *  @param component Description of the element in which the recommendation is displayed
+     *  @param experimentID Experiment identifier (default value is "default")
+     *  @param experimentComponent Component of the experiment (default value is "main")
+     */
+    public static void sendCollectionLoaded(@NonNull String collectionID,
+                                            @NonNull List<String> items,
+                                            @Nullable String appSectionID,
+                                            @Nullable String source,
+                                            @Nullable EventContextComponent component,
+                                            @Nullable String experimentID,
+                                            @Nullable String experimentComponent) {
+        EventContext context = EventContext.collectionContext(items, appSectionID, source, component, null, null, experimentID, experimentComponent);
+        Event.send(Constant.EventType.CollectionLoaded, collectionID, null, context, null);
+    }
+
 
 
     /**
@@ -188,7 +254,7 @@ public class Event {
      *  @param mediaID Unique identifier of the media
      *  @param properties Properties of the media and it's current state
      *  @param context Context of the media (e. g. view where it's displayed, component used to play the media...)
-     *  @param metadata Metadatas (should be kept as small as possible)
+     *  @param metadata Metadata (should be kept as small as possible)
      */
     public static void sendMediaPlay(@NonNull String mediaID,
                                      @Nullable EventProperties properties,
@@ -202,7 +268,7 @@ public class Event {
      *  @param mediaID Unique identifier of the media
      *  @param properties Properties of the media and it's current state
      *  @param context Context of the media (e. g. view where it's displayed, component used to play the media...)
-     *  @param metadata Metadatas (should be kept as small as possible)
+     *  @param metadata Metadata (should be kept as small as possible)
      */
     public static void sendMediaPause(@NonNull String mediaID,
                                       @Nullable EventProperties properties,
@@ -216,7 +282,7 @@ public class Event {
      *  @param mediaID Unique identifier of the media
      *  @param properties Properties of the media and it's current state
      *  @param context Context of the media (e. g. view where it's displayed, component used to play the media...)
-     *  @param metadata Metadatas (should be kept as small as possible)
+     *  @param metadata Metadata (should be kept as small as possible)
      */
     public static void sendMediaSeek(@NonNull String mediaID,
                                      @Nullable EventProperties properties,
@@ -230,7 +296,7 @@ public class Event {
      *  @param mediaID Unique identifier of the media
      *  @param properties Properties of the media and it's current state
      *  @param context Context of the media (e. g. view where it's displayed, component used to play the media...)
-     *  @param metadata Metadatas (should be kept as small as possible)
+     *  @param metadata Metadata (should be kept as small as possible)
      */
     public static void sendMediaStop(@NonNull String mediaID,
                                      @Nullable EventProperties properties,
@@ -244,7 +310,7 @@ public class Event {
      *  @param mediaID Unique identifier of the media
      *  @param properties Properties of the media and it's current state
      *  @param context Context of the media (e. g. view where it's displayed, component used to play the media...)
-     *  @param metadata Metadatas (should be kept as small as possible)
+     *  @param metadata Metadata (should be kept as small as possible)
      */
     public static void sendMediaEnd(@NonNull String mediaID,
                                     @Nullable EventProperties properties,
@@ -258,7 +324,7 @@ public class Event {
      *  @param mediaID Unique identifier of the media
      *  @param properties Properties of the media and it's current state
      *  @param context Context of the media (e. g. view where it's displayed, component used to play the media...)
-     *  @param metadata Metadatas (should be kept as small as possible)
+     *  @param metadata Metadata (should be kept as small as possible)
      */
     public static void sendMediaHeartbeat(@NonNull String mediaID,
                                           @Nullable EventProperties properties,
@@ -274,7 +340,7 @@ public class Event {
      *  @param mediaID Unique identifier of the media
      *  @param properties Properties of the media and it's current state
      *  @param context Context of the media (e. g. view where it's displayed, component used to play the media...)
-     *  @param metadata Metadatas (should be kept as small as possible)
+     *  @param metadata Metadata (should be kept as small as possible)
      */
     public static void sendMediaPlaylistAdd(@NonNull String mediaID,
                                             @Nullable EventProperties properties,
@@ -289,7 +355,7 @@ public class Event {
      *  @param mediaID Unique identifier of the media
      *  @param properties Properties of the media and it's current state
      *  @param context Context of the media (e. g. view where it's displayed, component used to play the media...)
-     *  @param metadata Metadatas (should be kept as small as possible)
+     *  @param metadata Metadata (should be kept as small as possible)
      */
     public static void sendMediaPlaylistRemove(@NonNull String mediaID,
                                                @Nullable EventProperties properties,

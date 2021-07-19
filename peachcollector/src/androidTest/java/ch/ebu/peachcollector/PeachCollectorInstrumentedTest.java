@@ -183,6 +183,24 @@ public class PeachCollectorInstrumentedTest{
     }
 
     @Test
+    public void testCollectionHit() throws InterruptedException {
+        Publisher publisher = PeachCollector.sharedCollector.publishers.get(PUBLISHER_NAME);
+        publisher.interval = 1;
+        publisher.maxEventsPerBatch = 1;
+
+        EventContextComponent carouselComponent = new EventContextComponent();
+        carouselComponent.type = "Carousel";
+        carouselComponent.name = "collectionCarousel";
+        carouselComponent.version = "1.0";
+
+        currentEventType = "collectionHit";
+
+        Event.sendCollectionHit("collection00", "media01", 1, null, null, carouselComponent, null, null);
+
+        Thread.sleep(2000);
+    }
+
+    @Test
     public void testRecommendationHit() throws InterruptedException {
         Publisher publisher = PeachCollector.sharedCollector.publishers.get(PUBLISHER_NAME);
         publisher.interval = 1;
@@ -329,7 +347,37 @@ public class PeachCollectorInstrumentedTest{
             }
             else if(payload != null && currentEventType != null){
                 Log.e("PEACH COLLECTOR", "payload received");
-                if (currentEventType.equalsIgnoreCase("recommendationHit")){
+                if (currentEventType.equalsIgnoreCase("collectionHit")){
+                    try {
+                        JSONObject json = new JSONObject(payload);
+                        JSONObject client = json.getJSONObject("client");
+                        assertTrue(client.getBoolean("user_logged_in"));
+                        JSONArray jArray = json.getJSONArray("events");
+                        assertEquals(jArray.length(), 1);
+                        for (int i = 0; i < jArray.length(); i++) {
+                            JSONObject event = jArray.getJSONObject(i);
+                            assertEquals("collection_hit", event.getString("type"));
+                            assertTrue(event.getLong("event_timestamp") < (new Date()).getTime());
+                            assertTrue(event.getLong("event_timestamp") > (new Date()).getTime() - 10000);
+                            assertEquals("collection00", event.getString("id"));
+
+                            JSONObject eventContext = event.getJSONObject("context");
+                            assertEquals(1, eventContext.getInt("hit_index"));
+                            assertEquals("media01", eventContext.getString("item_id"));
+                            assertEquals("default", eventContext.getString("experiment_id"));
+                            assertEquals("main", eventContext.getString("experiment_component"));
+
+                            JSONObject component = eventContext.getJSONObject("component");
+                            assertEquals("collectionCarousel", component.getString("name"));
+                            assertEquals("Carousel", component.getString("type"));
+                            assertEquals("1.0", component.getString("version"));
+                        }
+                    } catch (JSONException e) {
+                        e.printStackTrace();
+                    }
+                    Log.e("PEACH COLLECTOR", payload);
+                }
+                else if (currentEventType.equalsIgnoreCase("recommendationHit")){
                     try {
                         JSONObject json = new JSONObject(payload);
                         JSONObject client = json.getJSONObject("client");
