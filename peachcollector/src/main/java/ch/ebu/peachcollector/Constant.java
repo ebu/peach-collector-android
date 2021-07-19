@@ -39,6 +39,8 @@ public class Constant {
     public static final String CONTEXT_COMPONENT_TYPE_KEY = "type";
     public static final String CONTEXT_COMPONENT_NAME_KEY = "name";
     public static final String CONTEXT_COMPONENT_VERSION_KEY = "version";
+    public static final String CONTEXT_EXPERIMENT_ID_KEY = "experiment_id";
+    public static final String CONTEXT_EXPERIMENT_COMPONENT_KEY = "experiment_component";
 
     public static final String MEDIA_PLAYLIST_ID_KEY = "playlist_id";
     public static final String MEDIA_INSERT_POSITION_KEY = "insert_position";
@@ -141,6 +143,9 @@ public class Constant {
         public static final String RecommendationLoaded = "recommendation_loaded"; // RECOMMENDATION
         public static final String RecommendationHit = "recommendation_hit";
         public static final String RecommendationDisplayed = "recommendation_displayed";
+        public static final String CollectionLoaded = "collection_loaded"; // COLLECTION
+        public static final String CollectionHit = "collection_hit";
+        public static final String CollectionDisplayed = "collection_displayed";
         public static final String ArticleStart = "article_start"; // ARTICLE
         public static final String ArticleEnd = "article_end";
         public static final String ReadMore = "read_more";
