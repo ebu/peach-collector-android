@@ -201,6 +201,24 @@ public class PeachCollectorInstrumentedTest{
     }
 
     @Test
+    public void testCollectionItemDisplayed() throws InterruptedException {
+        Publisher publisher = PeachCollector.sharedCollector.publishers.get(PUBLISHER_NAME);
+        publisher.interval = 1;
+        publisher.maxEventsPerBatch = 1;
+
+        EventContextComponent carouselComponent = new EventContextComponent();
+        carouselComponent.type = "Carousel";
+        carouselComponent.name = "collectionCarousel";
+        carouselComponent.version = "1.0";
+
+        currentEventType = "collectionItemDisplayed";
+
+        Event.sendCollectionItemDisplayed("collection00", "media01", 1, 12, null, null, carouselComponent, null, null);
+
+        Thread.sleep(2000);
+    }
+
+    @Test
     public void testRecommendationHit() throws InterruptedException {
         Publisher publisher = PeachCollector.sharedCollector.publishers.get(PUBLISHER_NAME);
         publisher.interval = 1;
@@ -347,6 +365,30 @@ public class PeachCollectorInstrumentedTest{
             }
             else if(payload != null && currentEventType != null){
                 Log.e("PEACH COLLECTOR", "payload received");
+                if (currentEventType.equalsIgnoreCase("collectionItemDisplayed")){
+                    try {
+                        JSONObject json = new JSONObject(payload);
+                        JSONObject client = json.getJSONObject("client");
+                        assertTrue(client.getBoolean("user_logged_in"));
+                        JSONArray jArray = json.getJSONArray("events");
+                        assertEquals(jArray.length(), 1);
+                        for (int i = 0; i < jArray.length(); i++) {
+                            JSONObject event = jArray.getJSONObject(i);
+                            assertEquals("collection_item_displayed", event.getString("type"));
+                            assertEquals("collection00", event.getString("id"));
+
+                            JSONObject eventContext = event.getJSONObject("context");
+                            assertEquals(1, eventContext.getInt("item_index"));
+                            assertEquals(12, eventContext.getInt("items_count"));
+                            assertEquals("media01", eventContext.getString("item_id"));
+                            assertEquals("default", eventContext.getString("experiment_id"));
+                            assertEquals("main", eventContext.getString("experiment_component"));
+                        }
+                    } catch (JSONException e) {
+                        e.printStackTrace();
+                    }
+                    Log.e("PEACH COLLECTOR", payload);
+                }
                 if (currentEventType.equalsIgnoreCase("collectionHit")){
                     try {
                         JSONObject json = new JSONObject(payload);
