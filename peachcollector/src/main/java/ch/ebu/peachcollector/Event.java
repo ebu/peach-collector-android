@@ -115,6 +115,31 @@ public class Event {
     }
 
     /**
+     *  Send a collection item displayed event. Event will be added to the queue and sent accordingly to publishers' configurations.
+     *  @param collectionID Unique identifier of the collection.
+     *  @param itemID Unique identifier for item displayed
+     *  @param itemIndex Index of the item displayed
+     *  @param itemsCount Total number of items in the collection
+     *  @param appSectionID Unique identifier of app section where the recommendation is displayed
+     *  @param source Identifier of the element in which the recommendation is displayed (the module, view or popup)
+     *  @param component Description of the element in which the recommendation is displayed
+     *  @param experimentID Experiment identifier (default value is "default")
+     *  @param experimentComponent Component of the experiment (default value is "main")
+     */
+    public static void sendCollectionItemDisplayed(@NonNull String collectionID,
+                                                   @NonNull String itemID,
+                                                   @NonNull Number itemIndex,
+                                                   @NonNull Number itemsCount,
+                                                   @Nullable String appSectionID,
+                                                   @Nullable String source,
+                                                   @Nullable EventContextComponent component,
+                                                   @Nullable String experimentID,
+                                                   @Nullable String experimentComponent){
+        EventContext context = EventContext.collectionContext(null, appSectionID, source, component, null, itemID, itemIndex, itemsCount, experimentID, experimentComponent);
+        Event.send(Constant.EventType.CollectionItemDisplayed, collectionID, null, context, null);
+    }
+
+    /**
      *  Send a collection hit event. Event will be added to the queue and sent accordingly to publishers' configurations.
      *  @param collectionID Unique identifier of the collection.
      *  @param itemID Unique identifier for the clip, media or article hit
@@ -133,7 +158,7 @@ public class Event {
                                          @Nullable EventContextComponent component,
                                          @Nullable String experimentID,
                                          @Nullable String experimentComponent){
-        EventContext context = EventContext.collectionContext(null, appSectionID, source, component, hitIndex, itemID, experimentID, experimentComponent);
+        EventContext context = EventContext.collectionContext(null, appSectionID, source, component, hitIndex, itemID, null, null, experimentID, experimentComponent);
         Event.send(Constant.EventType.CollectionHit, collectionID, null, context, null);
     }
 
@@ -154,7 +179,7 @@ public class Event {
                                                @Nullable EventContextComponent component,
                                                @Nullable String experimentID,
                                                @Nullable String experimentComponent) {
-        EventContext context = EventContext.collectionContext(itemsDisplayed, appSectionID, source, component, null, null, experimentID, experimentComponent);
+        EventContext context = EventContext.collectionContext(itemsDisplayed, appSectionID, source, component, null, null, null, null, experimentID, experimentComponent);
         Event.send(Constant.EventType.CollectionDisplayed, collectionID, null, context, null);
     }
 
@@ -175,7 +200,7 @@ public class Event {
                                             @Nullable EventContextComponent component,
                                             @Nullable String experimentID,
                                             @Nullable String experimentComponent) {
-        EventContext context = EventContext.collectionContext(items, appSectionID, source, component, null, null, experimentID, experimentComponent);
+        EventContext context = EventContext.collectionContext(items, appSectionID, source, component, null, null, null, null, experimentID, experimentComponent);
         Event.send(Constant.EventType.CollectionLoaded, collectionID, null, context, null);
     }
 
