@@ -15,6 +15,8 @@ public class EventContext {
     @Nullable String itemID;
     @Nullable List<String> items;
     @Nullable Number hitIndex;
+    @Nullable Number itemIndex;
+    @Nullable Number itemsCount;
     @Nullable String appSectionID;
     @Nullable String source;
     @Nullable String referrer;
@@ -28,6 +30,8 @@ public class EventContext {
                                                  @Nullable EventContextComponent component,
                                                  @Nullable Number hitIndex,
                                                  @Nullable String itemID,
+                                                 @Nullable Number itemIndex,
+                                                 @Nullable Number itemsCount,
                                                  @Nullable String experimentID,
                                                  @Nullable String experimentComponent){
         EventContext context = new EventContext();
@@ -37,6 +41,8 @@ public class EventContext {
         context.component = component;
         context.hitIndex = hitIndex;
         context.itemID = itemID;
+        context.itemIndex = itemIndex;
+        context.itemsCount = itemsCount;
         if (experimentID != null) {
             context.experimentID = experimentID;
         }
@@ -153,6 +159,8 @@ public class EventContext {
         if(itemID != null) { json.put(CONTEXT_ITEM_ID_KEY, itemID); }
         if(items != null) { json.put(CONTEXT_ITEMS_KEY, items); }
         if(hitIndex != null) { json.put(CONTEXT_HIT_INDEX_KEY, hitIndex); }
+        if(itemIndex != null) { json.put(CONTEXT_ITEM_INDEX_KEY, itemIndex); }
+        if(itemsCount != null) { json.put(CONTEXT_ITEMS_COUNT_KEY, itemsCount); }
         if(appSectionID != null) { json.put(CONTEXT_PAGE_URI_KEY, appSectionID); }
         if(source != null) { json.put(CONTEXT_SOURCE_KEY, source); }
         if(referrer != null) { json.put(CONTEXT_REFERRER_KEY, referrer); }
