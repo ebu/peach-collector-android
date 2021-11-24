@@ -97,6 +97,16 @@ public class PeachCollectorInstrumentedTest{
     }
 
     @Test
+    public void testPublisherRemoteConfiguration() throws InterruptedException {
+        Publisher publisher = new Publisher("zzebu00000000017", "https://peach-bucket.ebu.io/zzebu/config-test.json");
+        Thread.sleep(60000);
+        boolean b = publisher.maxEventsPerBatch == 5;
+        boolean b2 = publisher.maxEventsPerBatchAfterOfflineSession == 500;
+        assertTrue("Remote config maxEventsPerBatch set",b);
+        assertTrue("Remote config maxEventsPerBatchAfterOfflineSession set",b2);
+    }
+
+    @Test
     public void testAppID() throws InterruptedException {
         Publisher publisher = PeachCollector.sharedCollector.publishers.get(PUBLISHER_NAME);
         publisher.interval = 1;
