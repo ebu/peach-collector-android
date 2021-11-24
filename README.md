@@ -84,6 +84,17 @@ publisher.maxEventsPerBatch = 50;
 publisher.maxEventsPerBatchAfterOfflineSession = 500;
 ```
 
+## Setting up a remote configuration
+`PeachCollector` allows you to set up a remote configuration URL. Remote configurations are simple JSON files with different fields to configure the publisher. For that, you need to provide the URL at the initialisation stage of the publisher.
+
+```java
+Publisher publisher = new Publisher("zzebu00000000017", "https://peach-bucket.ebu.io/zzebu/config-test.json");
+PeachCollector.addPublisher(publisher, "MyRemoteConfiguredPublisher");
+```
+
+In this remote configuration, you can for example define the interval (at which events are sent), the batch size (number of events per request) or the type of events that should be sent by the publisher.
+
+
 ### Flushing and Cleaning
 
 **`Flush`** is called when the application is about to go to background, or if a special type of event is sent while in background (events that will potentially push the application into an inactive state). It will try to send all the queued events (even if the maximum number of events hasn't been reached)

@@ -91,7 +91,7 @@ public class MainActivity extends AppCompatActivity {
         PeachCollector.shouldCollectAnonymousEvents = true;
         PeachCollector.init(getApplication());
 
-        Publisher publisher = new Publisher("zzebu00000000017");
+        Publisher publisher = new Publisher("zzebu00000000017", "https://peach-bucket.ebu.io/zzebu/config-test.json");
         PeachCollector.addPublisher(publisher, DEFAULT_PUBLISHER);
 
         Publisher publisher2 = new Publisher("zzebu00000000017"){

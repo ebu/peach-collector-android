@@ -2,6 +2,11 @@
 # Change Log
 All notable changes to this project will be documented in this file.
 
+## [1.1.0] - 2021-11-24
+
+### Added
+- Remote configuration for Publisher initialisation
+
 ## [1.0.13] - 2021-08-11
 
 ### Added

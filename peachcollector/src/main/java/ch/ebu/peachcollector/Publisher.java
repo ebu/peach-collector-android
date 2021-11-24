@@ -2,6 +2,7 @@ package ch.ebu.peachcollector;
 
 import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.content.pm.ApplicationInfo;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
@@ -17,14 +18,20 @@ import android.view.WindowManager;
 
 import com.google.gson.Gson;
 
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
+
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.net.URLConnection;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
@@ -33,6 +40,7 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.TimeZone;
 
+import static android.content.Context.MODE_PRIVATE;
 import static ch.ebu.peachcollector.Constant.*;
 
 public class Publisher {
@@ -41,6 +49,11 @@ public class Publisher {
      *  End point of the publisher, where all requests should be sent
      */
     public String serviceURL;
+
+    /**
+     *  URL for the remote configuration
+     */
+    public String remoteConfigurationURL;
 
     /**
      * The interval in seconds at which events are sent to the server.
@@ -71,6 +84,7 @@ public class Publisher {
 
     private Map<String, Object> clientInfo;
     private Map<String, Object> deviceInfo;
+    private JSONObject remoteConfiguration;
 
     public Publisher() {}
 
@@ -80,13 +94,74 @@ public class Publisher {
         }
     }
 
+    public Publisher(String siteKey, String remoteURL) {
+        if (!TextUtils.isEmpty(siteKey) && !TextUtils.isEmpty(remoteURL)) {
+            serviceURL = "https://pipe-collect.ebu.io/v3/collect?s=" + siteKey;
+            remoteConfigurationURL = remoteURL;
+
+            Context appContext = PeachCollector.getApplicationContext();
+
+            SharedPreferences sPrefs= appContext.getSharedPreferences("PeachCollector", MODE_PRIVATE);
+            String textJson = sPrefs.getString(remoteConfigurationURL, null);
+            if (textJson != null) {
+                try {
+                    remoteConfiguration = new JSONObject(textJson);
+                } catch (JSONException e) { }
+            }
+            checkConfig();
+        }
+    }
+
+    private void checkConfig() {
+        String expiryDateKey = remoteConfigurationURL + "_date";
+
+        Context appContext = PeachCollector.getApplicationContext();
+
+        long currentTimestamp = (new Date()).getTime();
+        SharedPreferences sPrefs= appContext.getSharedPreferences("PeachCollector", MODE_PRIVATE);
+        long expiryTimestamp = sPrefs.getLong(expiryDateKey, currentTimestamp);
+
+        if (currentTimestamp > expiryTimestamp) {
+            remoteConfiguration = null;
+        }
+        remoteConfiguration = null;
+
+       if (remoteConfiguration != null) {
+           try {
+               maxEventsPerBatch = remoteConfiguration.getInt("max_batch_size");
+               maxEventsPerBatchAfterOfflineSession = remoteConfiguration.getInt("max_events_per_request");
+               interval = remoteConfiguration.getInt("flush_interval_sec");
+           } catch (JSONException e) {
+               // Do nothing, we already have default values
+           }
+       }
+       else {
+           new RemoteTask().execute(remoteConfigurationURL);
+       }
+    }
+
     /**
      *  Return `YES` if the the publisher can process the event. This is used when an event is added to the queue to check
      *  if said event should be added to the publisher's queue.
      *  @param event The event to be queued.
      *  @return `YES` if the the publisher can process the event, `NO` otherwise.
      */
-    public boolean shouldProcessEvent(Event event){
+    public boolean shouldProcessEvent(Event event) {
+        if (remoteConfiguration != null && remoteConfiguration.has("filter")) {
+            try {
+                JSONArray eventsFilter = remoteConfiguration.getJSONArray("filter");
+                for (int i = 0; i < eventsFilter.length(); i++) {
+                    String event_type = eventsFilter.getString(i);
+                    if (event_type.equalsIgnoreCase(event.getType())) {
+                        return true;
+                    }
+                }
+            } catch (JSONException e) {
+                return false;
+            }
+            return false;
+        }
+
         return !TextUtils.isEmpty(serviceURL);
     }
 
@@ -281,4 +356,62 @@ public class Publisher {
         }
     }
 
+    protected class RemoteTask extends AsyncTask<String, Void, JSONObject> {
+        @Override
+        protected JSONObject doInBackground(String... params) {
+            URLConnection urlConn = null;
+            BufferedReader bufferedReader = null;
+            try {
+                URL url = new URL(params[0]);
+                urlConn = url.openConnection();
+                bufferedReader = new BufferedReader(new InputStreamReader(urlConn.getInputStream()));
+
+                StringBuffer stringBuffer = new StringBuffer();
+                String line;
+                while ((line = bufferedReader.readLine()) != null) {
+                    stringBuffer.append(line);
+                }
+
+                return new JSONObject(stringBuffer.toString());
+            }
+            catch(Exception ex) {
+                return null;
+            }
+            finally {
+                if(bufferedReader != null) {
+                    try {
+                        bufferedReader.close();
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
+                }
+            }
+        }
+
+        @Override
+        protected void onPostExecute(JSONObject response)
+        {
+            if(response != null)
+            {
+                remoteConfiguration = response;
+                double maxCacheHours = 1;
+
+                try {
+                    maxCacheHours = remoteConfiguration.getDouble("max_cache_hours");
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
+
+                Context appContext = PeachCollector.getApplicationContext();
+
+                long currentTimestamp = (new Date()).getTime();
+                long expiryTimestamp = (long) (currentTimestamp + (maxCacheHours*60*60));
+                SharedPreferences sPrefs= appContext.getSharedPreferences("PeachCollector", MODE_PRIVATE);
+
+                sPrefs.edit().putLong(remoteConfigurationURL + "_date", expiryTimestamp).apply();
+
+                checkConfig();
+            }
+        }
+    }
 }
