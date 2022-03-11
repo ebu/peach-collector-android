@@ -54,7 +54,7 @@ public class PeachCollectorInstrumentedTest{
 
         PeachCollector.isUnitTesting = true;
         PeachCollector.shouldCollectAnonymousEvents = true;
-        PeachCollector.userIsLoggedIn = true;
+        PeachCollector.setUserIsLoggedIn(true);
         Application app = (Application) mContext.getApplicationContext();
         PeachCollector.init(app);
         PeachCollector.clean();
@@ -120,6 +120,49 @@ public class PeachCollectorInstrumentedTest{
         assertTrue("The custom app ID was set", b);
     }
 
+    @Test
+    public void testUserIDChange() throws InterruptedException {
+        Publisher publisher = PeachCollector.sharedCollector.publishers.get(PUBLISHER_NAME);
+        publisher.interval = 1;
+        publisher.maxEventsPerBatch = 1;
+
+        currentEventType = "userID";
+
+
+        PeachCollector.userID = "123456789";
+        Event.sendPageView("page001", null, "reco00");
+
+        Thread.sleep(2000);
+        assertTrue("The custom user ID was set", mReceiver.testUserID1success);
+
+        PeachCollector.userID = "12345678910";
+        Event.sendPageView("page001", null, "reco00");
+
+        Thread.sleep(2000);
+        assertTrue("The custom user ID was changed", mReceiver.testUserID2success);
+    }
+
+    @Test
+    public void testUserIsLoggedInChange() throws InterruptedException {
+        Publisher publisher = PeachCollector.sharedCollector.publishers.get(PUBLISHER_NAME);
+        publisher.interval = 1;
+        publisher.maxEventsPerBatch = 1;
+
+        currentEventType = "userLoggedIn";
+
+
+        PeachCollector.setUserIsLoggedIn(true);
+        Event.sendPageView("page001", null, "reco00");
+
+        Thread.sleep(2000);
+        assertTrue("The custom user ID was set", mReceiver.testUserLoggedIn);
+
+        PeachCollector.setUserIsLoggedIn(false);
+        Event.sendPageView("page001", null, "reco00");
+
+        Thread.sleep(2000);
+        assertTrue("The custom user ID was changed", !mReceiver.testUserLoggedIn);
+    }
 
     @Test
     public void testWorkingPublisherWith1000Events() throws InterruptedException {
@@ -347,6 +390,12 @@ public class PeachCollectorInstrumentedTest{
         // testAppID
         boolean testAppIDsuccess;
 
+        // testUserIDChange
+        boolean testUserID1success;
+        boolean testUserID2success;
+
+        boolean testUserLoggedIn;
+
         public LogReceiver() {
         }
 
@@ -544,7 +593,30 @@ public class PeachCollectorInstrumentedTest{
                         e.printStackTrace();
                     }
                 }
+                else if(currentEventType.equalsIgnoreCase("userID")) {
+                    try {
+                        JSONObject json = new JSONObject(payload);
 
+                        Log.d("JSON", json.getString("user_id"));
+                        if (json.getString("user_id").equalsIgnoreCase("123456789")) {
+                            testUserID1success = true;
+                        }
+                        if (json.getString("user_id").equalsIgnoreCase("12345678910")) {
+                            testUserID2success = true;
+                        }
+                    } catch (JSONException e) {
+                        e.printStackTrace();
+                    }
+                }
+                else if(currentEventType.equalsIgnoreCase("userLoggedIn")) {
+                    try {
+                        JSONObject json = new JSONObject(payload);
+                        JSONObject client = json.getJSONObject("client");
+                        testUserLoggedIn = client.getBoolean("user_logged_in");
+                    } catch (JSONException e) {
+                        e.printStackTrace();
+                    }
+                }
 
                 testSuccess = false;
             }

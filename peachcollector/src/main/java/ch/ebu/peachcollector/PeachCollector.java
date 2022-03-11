@@ -56,9 +56,18 @@ public class PeachCollector {
     public static String appID;
 
     /**
-     *  Define if the user is logged in (userID can be defined for anonymous users)
+     *  Define if the user is logged in (because userID can be defined for anonymous users)
      */
-    public static Boolean userIsLoggedIn;
+    private static Boolean userIsLoggedIn;
+
+    public static Boolean getUserIsLoggedIn() {
+        return userIsLoggedIn;
+    }
+
+    public static void setUserIsLoggedIn(Boolean loggedIn){
+        userIsLoggedIn = loggedIn;
+        invalidatePublishersClientInfo();
+    }
 
     /**
      *  The Device ID used by the framework is the Advertising ID provided by Apple.
@@ -218,6 +227,17 @@ public class PeachCollector {
         sharedCollector.resetPublisherStatuses(publisherName);
         // send events in the database that are queued for this publisher
         sharedCollector.sendEventsToPublisher(publisherName);
+    }
+
+    /**
+     *  Invalidate the cached data for client info sent in every request
+     *  This will force the publisher to recreate the client info using the latest values
+     */
+    public static void invalidatePublishersClientInfo() {
+        if (sharedCollector == null || sharedCollector.publishers == null || sharedCollector.publishers.isEmpty()) return;
+        for (Publisher publisher: sharedCollector.publishers.values()) {
+            publisher.invalidateClientInfo();
+        }
     }
 
     private void resetPublisherStatuses(final String publisherName){

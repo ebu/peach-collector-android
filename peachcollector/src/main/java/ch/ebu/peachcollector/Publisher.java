@@ -165,6 +165,9 @@ public class Publisher {
         return !TextUtils.isEmpty(serviceURL);
     }
 
+    public void invalidateClientInfo(){
+        clientInfo = null;
+    }
     public Map<String, Object> clientInfo(){
         if (clientInfo != null) return clientInfo;
         clientInfo = new HashMap<>();
@@ -201,7 +204,7 @@ public class Publisher {
         if (applicationName.length() == 0) applicationName = "unknown";
         clientInfo.put(CLIENT_APP_NAME_KEY, applicationName);
         clientInfo.put(CLIENT_ID_KEY, PeachCollector.getDeviceID());
-        clientInfo.put(CLIENT_USER_IS_LOGGED_IN_KEY, PeachCollector.userIsLoggedIn);
+        clientInfo.put(CLIENT_USER_IS_LOGGED_IN_KEY, PeachCollector.getUserIsLoggedIn());
 
         clientInfo.put(DEVICE_KEY, deviceInfo());
         clientInfo.put(OS_KEY, osInfo());
