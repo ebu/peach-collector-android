@@ -2,6 +2,11 @@
 # Change Log
 All notable changes to this project will be documented in this file.
 
+## [1.1.1] - 2022-03-11
+
+### Changed
+- `userIsLoggedIn` is now private. Added setter that will make sure the value is updated in all publishers' client data.
+
 ## [1.1.0] - 2021-11-24
 
 ### Added
