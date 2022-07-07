@@ -2,6 +2,11 @@
 # Change Log
 All notable changes to this project will be documented in this file.
 
+## [1.1.2] - 2022-06-07
+
+### Added
+- Possibility to add custom fields to the payload's client description. It can be done by configuring the `Publisher`
+
 ## [1.1.1] - 2022-03-11
 
 ### Changed

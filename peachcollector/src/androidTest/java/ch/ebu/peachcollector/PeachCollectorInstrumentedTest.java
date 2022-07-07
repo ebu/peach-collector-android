@@ -143,6 +143,22 @@ public class PeachCollectorInstrumentedTest{
     }
 
     @Test
+    public void testCustomClientField() throws InterruptedException {
+        Publisher publisher = PeachCollector.sharedCollector.publishers.get(PUBLISHER_NAME);
+        publisher.interval = 1;
+        publisher.maxEventsPerBatch = 1;
+        publisher.addClientField("testField", "test");
+
+        currentEventType = "customClientField";
+
+        Event.sendPageView("page001", null, "reco00");
+
+        Thread.sleep(2000);
+        assertTrue("The custom client field was not set", mReceiver.testCustomClientField);
+
+    }
+
+    @Test
     public void testUserIsLoggedInChange() throws InterruptedException {
         Publisher publisher = PeachCollector.sharedCollector.publishers.get(PUBLISHER_NAME);
         publisher.interval = 1;
@@ -396,6 +412,8 @@ public class PeachCollectorInstrumentedTest{
 
         boolean testUserLoggedIn;
 
+        boolean testCustomClientField;
+
         public LogReceiver() {
         }
 
@@ -613,6 +631,16 @@ public class PeachCollectorInstrumentedTest{
                         JSONObject json = new JSONObject(payload);
                         JSONObject client = json.getJSONObject("client");
                         testUserLoggedIn = client.getBoolean("user_logged_in");
+                    } catch (JSONException e) {
+                        e.printStackTrace();
+                    }
+                }
+                else if(currentEventType.equalsIgnoreCase("customClientField")) {
+                    try {
+                        JSONObject json = new JSONObject(payload);
+                        JSONObject client = json.getJSONObject("client");
+                        Log.d("TEST", client.toString() );
+                        testCustomClientField = client.getString("testField").equalsIgnoreCase("test");
                     } catch (JSONException e) {
                         e.printStackTrace();
                     }

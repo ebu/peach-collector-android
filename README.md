@@ -84,6 +84,14 @@ publisher.maxEventsPerBatch = 50;
 publisher.maxEventsPerBatchAfterOfflineSession = 500;
 ```
 
+### Adding custom data to a Publisher's client information
+Everytime events are sent to the defined __SiteKey__ or server, the payload (containing the JSON description of the events) has a single description of the client used. You can add any custom fields to this client description and it will be sent in every request.
+```java
+publisher.addClientField("country", "Germany");
+publisher.addClientField("isGeolocalized", true);
+```
+
+
 ## Setting up a remote configuration
 `PeachCollector` allows you to set up a remote configuration URL. Remote configurations are simple JSON files with different fields to configure the publisher. For that, you need to provide the URL at the initialisation stage of the publisher.
 
