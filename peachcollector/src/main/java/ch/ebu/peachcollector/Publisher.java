@@ -43,6 +43,8 @@ import java.util.TimeZone;
 import static android.content.Context.MODE_PRIVATE;
 import static ch.ebu.peachcollector.Constant.*;
 
+import androidx.annotation.Nullable;
+
 public class Publisher {
 
     /**
@@ -165,12 +167,80 @@ public class Publisher {
         return !TextUtils.isEmpty(serviceURL);
     }
 
+    @Nullable
+    private Map<String, Object> customClientFields;
+
+    private void addClientObject(String key, Object value) {
+        if (value == null) {
+            removeCustomClientField(key);
+            return;
+        }
+
+        if (customClientFields == null) {
+            customClientFields = new HashMap<>();
+        }
+
+        customClientFields.put(key, value);
+    }
+
+    /**
+     * Add a custom string field to the client
+     */
+    public void addClientField(String key, String value){
+        addClientObject(key, value);
+    }
+
+    /**
+     * Add a custom number field to the client
+     */
+    public void addClientField(String key, Number value){
+        addClientObject(key, value);
+    }
+
+    /**
+     * Add a custom boolean field to the client
+     */
+    public void addClientField(String key, Boolean value){
+        addClientObject(key, value);
+    }
+
+    /**
+     * Remove a custom client field previously added
+     */
+    public void removeCustomClientField(String key){
+        if (customClientFields != null && customClientFields.containsKey(key)){
+            customClientFields.remove(key);
+            if (customClientFields.size() == 0) customClientFields = null;
+        }
+    }
+
+    /**
+     * Retrieve a custom client field previously added.
+     * @return null if the field was not found
+     */
+    @Nullable public Object getCustomClientField(String key){
+        if (customClientFields != null) return customClientFields.get(key);
+        return null;
+    }
+
+
     public void invalidateClientInfo(){
         clientInfo = null;
     }
     public Map<String, Object> clientInfo(){
-        if (clientInfo != null) return clientInfo;
+        if (clientInfo != null) {
+            if (customClientFields != null) {
+                HashMap<String, Object> newClientInfo = new HashMap<>();
+                newClientInfo.putAll(clientInfo);
+                newClientInfo.putAll(customClientFields);
+                return newClientInfo;
+            }
+            return clientInfo;
+        }
         clientInfo = new HashMap<>();
+        if (customClientFields != null) {
+            clientInfo.putAll(customClientFields);
+        }
 
         Context appContext = PeachCollector.getApplicationContext();
 
