@@ -115,6 +115,28 @@ public class Event {
     }
 
     /**
+     *  Send a new event to a specific publisher. Event will be added to the queue and sent accordingly to the publisher's configuration.
+     *  @param type    Name of the event's type.
+     *  @param eventID unique identifier related to the event (e.g., data source id for a recommendation hit, media id for a media play)
+     *  @param properties optional properties related to the event
+     *  @param context optional context of the event (usually contains a component, e.g. Carousel, VideoPlayer...)
+     *  @param metadata optional dictionary of metadata (should be kept as small as possible)
+     *  @param publisher Name of the publisher
+     */
+    public static void send(@NonNull String type,
+                            @NonNull String eventID,
+                            @Nullable EventProperties properties,
+                            @Nullable EventContext context,
+                            @Nullable Map<String, Object> metadata,
+                            @NonNull String publisher){
+        Event event = new Event(eventID, type);
+        event.setProperties(properties);
+        event.setContext(context);
+        event.mMetadata = metadata;
+        PeachCollector.sendEvent(event, publisher);
+    }
+
+    /**
      *  Send a collection item displayed event. Event will be added to the queue and sent accordingly to publishers' configurations.
      *  @param collectionID Unique identifier of the collection.
      *  @param itemID Unique identifier for item displayed
@@ -350,12 +372,19 @@ public class Event {
      *  @param properties Properties of the media and it's current state
      *  @param context Context of the media (e. g. view where it's displayed, component used to play the media...)
      *  @param metadata Metadata (should be kept as small as possible)
+     *  @param publisher Optional Name of the publisher to send the event to
      */
     public static void sendMediaHeartbeat(@NonNull String mediaID,
                                           @Nullable EventProperties properties,
                                           @Nullable EventContext context,
-                                          @Nullable Map<String, Object> metadata) {
-        Event.send(Constant.EventType.MediaHeartbeat, mediaID, properties, context, metadata);
+                                          @Nullable Map<String, Object> metadata,
+                                          @Nullable String publisher) {
+        if (publisher != null) {
+            Event.send(Constant.EventType.MediaHeartbeat, mediaID, properties, context, metadata, publisher);
+        }
+        else {
+            Event.send(Constant.EventType.MediaHeartbeat, mediaID, properties, context, metadata);
+        }
     }
 
 

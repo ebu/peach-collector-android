@@ -2,6 +2,11 @@
 # Change Log
 All notable changes to this project will be documented in this file.
 
+## [1.2.0] - 2023-04-02
+
+### Added
+- PeachPlayerTracker static class to track a media played in an ExoPlayer
+
 ## [1.1.2] - 2022-06-07
 
 ### Added
