@@ -78,6 +78,12 @@ public class Publisher {
     public Integer maxEventsPerBatchAfterOfflineSession = 1000;
 
     /**
+     *  Interval between heartbeats when tracking a media.
+     *  Default value is 5 seconds.
+     */
+    public Integer playerTrackerHeartbeatInterval = 5;
+
+    /**
      *  How the publisher should behave after an offline period
      *  Default is `send all`
      */
@@ -126,13 +132,21 @@ public class Publisher {
         if (currentTimestamp > expiryTimestamp) {
             remoteConfiguration = null;
         }
-        remoteConfiguration = null;
 
        if (remoteConfiguration != null) {
            try {
-               maxEventsPerBatch = remoteConfiguration.getInt("max_batch_size");
-               maxEventsPerBatchAfterOfflineSession = remoteConfiguration.getInt("max_events_per_request");
-               interval = remoteConfiguration.getInt("flush_interval_sec");
+               if (remoteConfiguration.has("max_batch_size")) {
+                   maxEventsPerBatch = remoteConfiguration.getInt("max_batch_size");
+               }
+               if (remoteConfiguration.has("max_events_per_request")) {
+                   maxEventsPerBatchAfterOfflineSession = remoteConfiguration.getInt("max_events_per_request");
+               }
+               if (remoteConfiguration.has("flush_interval_sec")) {
+                   interval = remoteConfiguration.getInt("flush_interval_sec");
+               }
+               if (remoteConfiguration.has("heartbeat_frequency_sec")) {
+                   playerTrackerHeartbeatInterval = remoteConfiguration.getInt("heartbeat_frequency_sec");
+               }
            } catch (JSONException e) {
                // Do nothing, we already have default values
            }

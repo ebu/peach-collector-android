@@ -136,3 +136,15 @@ items.add("media03");
 Event.sendRecommendationDisplayed("reco00", items , null, null, carouselComponent);
 
 ```
+
+### Setting up a player tracker
+
+To track a player automatically, you just need to provide the ExoPlayer instance and information about the item that is being played.
+You can provide information about the item or leave empty. The tracker will only update (or create if not provided) the `props` part of the events with data from the player
+You can start and stop tracking an item manually.
+
+```java
+PeachPlayerTracker.setPlayer(exoPlayer);
+PeachPlayerTracker.trackMedia("video0001", null, null, null);
+PeachPlayerTracker.clearCurrentItem(); 
+```

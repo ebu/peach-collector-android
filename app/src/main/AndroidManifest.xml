@@ -16,7 +16,7 @@
         android:theme="@style/AppTheme">
 
 
-        <activity android:name="ch.ebu.peachdemo.MainActivity">
+        <activity android:name="ch.ebu.peachdemo.MainActivity" android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 

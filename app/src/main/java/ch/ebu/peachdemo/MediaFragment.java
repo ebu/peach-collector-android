@@ -8,6 +8,7 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -15,8 +16,17 @@ import android.widget.ImageButton;
 import android.widget.MediaController;
 import android.widget.VideoView;
 
+import com.google.android.exoplayer2.ExoPlayer;
+import com.google.android.exoplayer2.ForwardingPlayer;
+import com.google.android.exoplayer2.MediaItem;
+import com.google.android.exoplayer2.Player;
+import com.google.android.exoplayer2.analytics.AnalyticsListener;
+import com.google.android.exoplayer2.ui.StyledPlayerView;
+
 import ch.ebu.peachcollector.EventContextComponent;
 import ch.ebu.peachcollector.Event;
+import ch.ebu.peachcollector.PeachCollector;
+import ch.ebu.peachcollector.PeachPlayerTracker;
 
 
 /**
@@ -25,9 +35,7 @@ import ch.ebu.peachcollector.Event;
  */
 public class MediaFragment extends Fragment {
 
-    private ImageButton playerButton;
-    private MediaController mediaController;
-    private VideoView videoView;
+    private StyledPlayerView videoView;
 
     private EventContextComponent component = new EventContextComponent();
 
@@ -54,42 +62,28 @@ public class MediaFragment extends Fragment {
         return inflater.inflate(R.layout.fragment_media, container, false);
     }
 
-
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
 
-        playerButton = view.findViewById(R.id.playerButton);
-        playerButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                if (videoView.isPlaying()) {
-                    videoView.pause();
-                    playerButton.setImageResource(R.drawable.icon_play);
-                    Event.sendMediaPause("media00", null, null, null);
-                }
-                else {
-                    videoView.start();
-                    playerButton.setImageResource(R.drawable.icon_pause);
-                    Event.sendMediaPlay("media00", null, null, null);
-                }
-            }
-        });
-
+        final ExoPlayer player = new ExoPlayer.Builder(getContext()).build();
         videoView = view.findViewById(R.id.player);
-        //Set MediaController  to enable play, pause, forward, etc options.
-        mediaController = new MediaController(getContext());
-        mediaController.setAnchorView(videoView);
+        videoView.setPlayer(player);
+
         //Location of Media File
         Uri uri = Uri.parse("android.resource://" + getContext().getPackageName() + "/" + R.raw.peach);
-        //Starting VideView By Setting MediaController and URI
-        videoView.setMediaController(mediaController);
-        videoView.setVideoURI(uri);
-        videoView.requestFocus();
-        //videoView.start();
 
+        // Build the media item.
+        MediaItem mediaItem = MediaItem.fromUri(uri);
+        // Set the media item to be played.
+        player.setMediaItem(mediaItem);
+        // Prepare the player.
+        player.prepare();
+        // Start the playback.
+        player.play();
 
-
+        PeachPlayerTracker.setPlayer(player);
+        PeachPlayerTracker.trackMedia("test0001", null, null, null);
 
     }
 }

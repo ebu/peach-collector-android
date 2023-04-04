@@ -214,6 +214,33 @@ public class PeachCollector {
         }
     }
 
+    public static void sendEvent(final Event event, final String publisherName) {
+        if (shouldCollectAnonymousEvents || !limitedTrackingEnabled || userID != null) {
+            if (sharedCollector == null || sharedCollector.dbExecutor == null) return;
+            sharedCollector.dbExecutor.execute(new Runnable() {
+                @Override
+                public void run() {
+                    long eventRowID = sharedCollector.database.peachCollectorEventDao().insert(event);
+                    Publisher publisher = sharedCollector.publishers.get(publisherName);
+
+                    if (publisher.shouldProcessEvent(event)) {
+                        EventStatus status = new EventStatus((int) eventRowID, publisherName, 0);
+                        sharedCollector.database.peachCollectorEventDao().insert(status);
+                    }
+
+                    if (PeachCollector.isUnitTesting) {
+                        Intent intent = new Intent();
+                        intent.setAction(PEACH_LOG_NOTIFICATION);
+                        intent.putExtra(PEACH_LOG_NOTIFICATION_MESSAGE, "+ Event (" + event.getType() + ")");
+                        applicationContext.sendBroadcast(intent);
+                    }
+
+                    sharedCollector.checkPublishers();
+                }
+            });
+        }
+    }
+
     /**
      *  Adds a publisher to the list of publishers linked to the queue
      *  A custom Publisher can send the events to another end point, potentially in a different format.

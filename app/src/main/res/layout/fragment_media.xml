@@ -5,20 +5,17 @@
     android:layout_height="match_parent"
     tools:context=".MediaFragment">
 
-    <VideoView
+    <com.google.android.exoplayer2.ui.StyledPlayerView
         android:id="@+id/player"
         android:layout_width="match_parent"
         android:layout_height="250dp"
-        android:layout_gravity="top" />
+        android:layout_gravity="top"
+        android:layout_margin="0dp"
+        android:contentDescription=""
+        android:padding="0dp"
+        android:scaleType="fitCenter"
 
-    <ImageButton
-        android:id="@+id/playerButton"
-        android:layout_width="40dp"
-        android:layout_height="40dp"
-        android:src="@drawable/icon_play"
-        android:layout_marginTop="255dp"
-        android:layout_gravity="center_horizontal"/>
-
+        />
 
 
 </FrameLayout>
