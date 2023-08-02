@@ -1,2 +1,2 @@
-include ':app', ':peachcollector', ':peachdemokotlin'
+include ':app', ':peachcollector'
 rootProject.name='PeachDemo'
