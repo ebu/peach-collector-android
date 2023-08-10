@@ -2,6 +2,14 @@
 # Change Log
 All notable changes to this project will be documented in this file.
 
+## [1.2.1] - 2023-08-10
+
+### Updated
+- Gradle version and build tools
+
+### Removed
+- Kotlin demo, to simplify build
+
 ## [1.2.0] - 2023-04-02
 
 ### Added
