@@ -28,6 +28,56 @@ public class PeachPlayerTracker {
     private HashMap<String, Timer> publisherTimers;
     private Date trackingStartDate;
 
+    private AnalyticsListener analyticsListener = new AnalyticsListener() {
+        @Override
+        public void onPlaybackStateChanged(AnalyticsListener.EventTime eventTime, @Player.State int state) {
+            sharedTracker.updateTimeSpent();
+            if (state == 3 && sharedTracker.player.isPlaying()) { // playing
+                sharedTracker.startHeartbeats();
+                sharedTracker.props.playbackPosition = sharedTracker.player.getCurrentPosition() / 1000;
+                Event.sendMediaPlay(sharedTracker.itemID, sharedTracker.props, sharedTracker.context, sharedTracker.metadata);
+            }
+            else if (state == 4) { // reached the end
+                sharedTracker.stopHeartbeats();
+                sharedTracker.props.playbackPosition = sharedTracker.player.getCurrentPosition() / 1000;
+                Event.sendMediaEnd(sharedTracker.itemID, sharedTracker.props, sharedTracker.context, sharedTracker.metadata);
+            }
+            else {
+                // Paused because of buffering
+            }
+        }
+        @Override
+        public void onPlayWhenReadyChanged(AnalyticsListener.EventTime eventTime, boolean playWhenReady, @Player.PlayWhenReadyChangeReason int reason){
+            sharedTracker.updateTimeSpent();
+            if (playWhenReady) { // playing
+                sharedTracker.startHeartbeats();
+                sharedTracker.props.playbackPosition = sharedTracker.player.getCurrentPosition() / 1000;
+                Event.sendMediaPlay(sharedTracker.itemID, sharedTracker.props, sharedTracker.context, sharedTracker.metadata);
+            }
+            else { // paused
+                sharedTracker.stopHeartbeats();
+                sharedTracker.props.playbackPosition = sharedTracker.player.getCurrentPosition() / 1000;
+                Event.sendMediaPause(sharedTracker.itemID, sharedTracker.props, sharedTracker.context, sharedTracker.metadata);
+            }
+        }
+        @Override
+        public void onPositionDiscontinuity(AnalyticsListener.EventTime eventTime, Player.PositionInfo oldPosition, Player.PositionInfo newPosition, @Player.DiscontinuityReason int reason) {
+            sharedTracker.updateTimeSpent();
+            sharedTracker.props.playbackPosition = newPosition.positionMs / 1000;
+            sharedTracker.props.previousPlaybackPosition = oldPosition.positionMs / 1000;
+            Event.sendMediaSeek(sharedTracker.itemID, sharedTracker.props, sharedTracker.context, sharedTracker.metadata);
+            sharedTracker.props.previousPlaybackPosition = null;
+        }
+        @Override
+        public void onVolumeChanged(AnalyticsListener.EventTime eventTime, float volume) {
+            sharedTracker.props.volume = volume;
+        }
+
+        @Override
+        public void onPlaybackParametersChanged(AnalyticsListener.EventTime eventTime, PlaybackParameters playbackParameters) {
+            sharedTracker.props.playbackRate = playbackParameters.speed;
+        }
+    };
     /**
      *  Initialize the player tracker. This will not trigger any events
      *  @param player The player used in the application.
@@ -38,56 +88,10 @@ public class PeachPlayerTracker {
         }
 
         sharedTracker.player = player;
-        sharedTracker.player.addAnalyticsListener(new AnalyticsListener() {
-            @Override
-            public void onPlaybackStateChanged(EventTime eventTime, @Player.State int state) {
-                sharedTracker.updateTimeSpent();
-                if (state == 3 && sharedTracker.player.isPlaying()) { // playing
-                    sharedTracker.startHeartbeats();
-                    sharedTracker.props.playbackPosition = sharedTracker.player.getCurrentPosition() / 1000;
-                    Event.sendMediaPlay(sharedTracker.itemID, sharedTracker.props, sharedTracker.context, sharedTracker.metadata);
-                }
-                else if (state == 4) { // reached the end
-                    sharedTracker.stopHeartbeats();
-                    sharedTracker.props.playbackPosition = sharedTracker.player.getCurrentPosition() / 1000;
-                    Event.sendMediaEnd(sharedTracker.itemID, sharedTracker.props, sharedTracker.context, sharedTracker.metadata);
-                }
-                else {
-                    // Paused because of buffering
-                }
-            }
-            @Override
-            public void onPlayWhenReadyChanged(EventTime eventTime, boolean playWhenReady, @Player.PlayWhenReadyChangeReason int reason){
-                sharedTracker.updateTimeSpent();
-                if (playWhenReady) { // playing
-                    sharedTracker.startHeartbeats();
-                    sharedTracker.props.playbackPosition = sharedTracker.player.getCurrentPosition() / 1000;
-                    Event.sendMediaPlay(sharedTracker.itemID, sharedTracker.props, sharedTracker.context, sharedTracker.metadata);
-                }
-                else { // paused
-                    sharedTracker.stopHeartbeats();
-                    sharedTracker.props.playbackPosition = sharedTracker.player.getCurrentPosition() / 1000;
-                    Event.sendMediaPause(sharedTracker.itemID, sharedTracker.props, sharedTracker.context, sharedTracker.metadata);
-                }
-            }
-            @Override
-            public void onPositionDiscontinuity(EventTime eventTime, Player.PositionInfo oldPosition, Player.PositionInfo newPosition, @Player.DiscontinuityReason int reason) {
-                sharedTracker.updateTimeSpent();
-                sharedTracker.props.playbackPosition = newPosition.positionMs / 1000;
-                sharedTracker.props.previousPlaybackPosition = oldPosition.positionMs / 1000;
-                Event.sendMediaSeek(sharedTracker.itemID, sharedTracker.props, sharedTracker.context, sharedTracker.metadata);
-                sharedTracker.props.previousPlaybackPosition = null;
-            }
-            @Override
-            public void onVolumeChanged(EventTime eventTime, float volume) {
-                sharedTracker.props.volume = volume;
-            }
 
-            @Override
-            public void onPlaybackParametersChanged(EventTime eventTime, PlaybackParameters playbackParameters) {
-                sharedTracker.props.playbackRate = playbackParameters.speed;
-            }
-        });
+        if (sharedTracker.itemID != null) {
+            sharedTracker.player.addAnalyticsListener(sharedTracker.analyticsListener);
+        }
     }
 
     /**
@@ -111,22 +115,30 @@ public class PeachPlayerTracker {
         if (sharedTracker.props == null) {
             sharedTracker.props = new EventProperties();
         }
-        sharedTracker.props.playbackRate = 1;
-        sharedTracker.props.playbackPosition = 0;
+        sharedTracker.props.playbackRate = sharedTracker.player != null ? sharedTracker.player.getPlaybackParameters().speed : 1;
+        sharedTracker.props.playbackPosition = sharedTracker.player != null ? sharedTracker.player.getCurrentPosition() / 1000 : 0;
         sharedTracker.props.timeSpent = 0;
+
+        if (sharedTracker.player != null) {
+            sharedTracker.player.addAnalyticsListener(sharedTracker.analyticsListener);
+            if (sharedTracker.player.isPlaying()) {
+                sharedTracker.startHeartbeats();
+            }
+        }
     }
 
     /**
      *  Stop tracking of the current media item
      */
     public static void clearCurrentItem() {
+        sharedTracker.stopHeartbeats();
+        sharedTracker.player.removeAnalyticsListener(sharedTracker.analyticsListener);
+
         sharedTracker.itemID = null;
         sharedTracker.props = null;
         sharedTracker.context = null;
         sharedTracker.metadata = null;
         sharedTracker.trackingStartDate = null;
-
-        sharedTracker.stopHeartbeats();
     }
 
     private void startHeartbeats() {
@@ -170,6 +182,7 @@ public class PeachPlayerTracker {
     }
 
     private void updateTimeSpent() {
+        if (sharedTracker.trackingStartDate == null) return;
         Date now = new Date();
         long diff =  now.getTime() - sharedTracker.trackingStartDate.getTime();
         sharedTracker.props.timeSpent = diff / 1000;
