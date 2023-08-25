@@ -2,6 +2,11 @@
 # Change Log
 All notable changes to this project will be documented in this file.
 
+## [1.2.2] - 2023-08-25
+### Updated
+- PlayerTracker to be more robust. 
+- Start and stop of tracking is dependant on provided item
+
 ## [1.2.1] - 2023-08-10
 
 ### Updated
