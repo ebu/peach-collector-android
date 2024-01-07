@@ -2,6 +2,10 @@
 # Change Log
 All notable changes to this project will be documented in this file.
 
+## [1.2.3] - 2024-01-08
+### Updated
+- PlayerTracker to manage case of item's "trackMedia" called multiple times
+
 ## [1.2.2] - 2023-08-25
 ### Updated
 - PlayerTracker to be more robust. 
