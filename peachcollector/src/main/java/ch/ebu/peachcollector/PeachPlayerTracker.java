@@ -105,6 +105,7 @@ public class PeachPlayerTracker {
                                   @Nullable EventProperties properties,
                                   @Nullable EventContext context,
                                   @Nullable Map<String, Object> metadata){
+        boolean isNewItem = sharedTracker.itemID == null || !mediaID.equals(sharedTracker.itemID);
         sharedTracker.itemID = mediaID;
         sharedTracker.props = properties;
         sharedTracker.context = context;
@@ -117,7 +118,9 @@ public class PeachPlayerTracker {
         }
         sharedTracker.props.playbackRate = sharedTracker.player != null ? sharedTracker.player.getPlaybackParameters().speed : 1;
         sharedTracker.props.playbackPosition = sharedTracker.player != null ? sharedTracker.player.getCurrentPosition() / 1000 : 0;
-        sharedTracker.props.timeSpent = 0;
+        if (isNewItem) {
+            sharedTracker.props.timeSpent = 0;
+        }
 
         if (sharedTracker.player != null) {
             sharedTracker.player.addAnalyticsListener(sharedTracker.analyticsListener);
@@ -158,7 +161,7 @@ public class PeachPlayerTracker {
                             @Override
                             public void run() {
                                 updateTimeSpent();
-                                props.playbackPosition = sharedTracker.player.getCurrentPosition();
+                                props.playbackPosition = sharedTracker.player.getCurrentPosition() / 1000;
                                 Event.sendMediaHeartbeat(itemID, props, context, metadata, publisherName);
                             } // This is your code
                         };
