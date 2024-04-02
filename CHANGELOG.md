@@ -2,6 +2,11 @@
 # Change Log
 All notable changes to this project will be documented in this file.
 
+## [1.2.4] - 2024-04-02
+### Updated
+- Fixed remote configuration of heartbeat intervals in the PlayerTracker
+
+
 ## [1.2.3] - 2024-01-08
 ### Updated
 - PlayerTracker to manage case of item's "trackMedia" called multiple times
