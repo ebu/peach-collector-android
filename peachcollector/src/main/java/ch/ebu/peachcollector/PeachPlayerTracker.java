@@ -147,7 +147,7 @@ public class PeachPlayerTracker {
     private void startHeartbeats() {
         for (final String publisherName: PeachCollector.sharedCollector.publishers.keySet()) {
             final Publisher publisher = PeachCollector.sharedCollector.publishers.get(publisherName);
-            long interval = publisher.interval;
+            long interval = publisher.playerTrackerHeartbeatInterval;
 
             Timer timer = sharedTracker.publisherTimers.get(publisherName);
             if (timer == null) {
