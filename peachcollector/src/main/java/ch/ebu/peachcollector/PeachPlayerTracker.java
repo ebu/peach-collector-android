@@ -160,10 +160,11 @@ public class PeachPlayerTracker {
                         Runnable myRunnable = new Runnable() {
                             @Override
                             public void run() {
+                                if (props == null) return;
                                 updateTimeSpent();
                                 props.playbackPosition = sharedTracker.player.getCurrentPosition() / 1000;
                                 Event.sendMediaHeartbeat(itemID, props, context, metadata, publisherName);
-                            } // This is your code
+                            }
                         };
                         mainHandler.post(myRunnable);
                     }

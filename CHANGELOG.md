@@ -2,6 +2,11 @@
 # Change Log
 All notable changes to this project will be documented in this file.
 
+## [1.2.5] - 2024-04-12
+### Updated
+- PlayerTracker heartbeat loop to avoid null pointers after clearing media
+
+
 ## [1.2.4] - 2024-04-02
 ### Updated
 - Fixed remote configuration of heartbeat intervals in the PlayerTracker
