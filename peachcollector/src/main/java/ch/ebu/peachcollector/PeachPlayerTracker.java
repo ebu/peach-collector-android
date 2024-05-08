@@ -134,6 +134,7 @@ public class PeachPlayerTracker {
      *  Stop tracking of the current media item
      */
     public static void clearCurrentItem() {
+        if (sharedTracker == null) { return; }
         sharedTracker.stopHeartbeats();
         sharedTracker.player.removeAnalyticsListener(sharedTracker.analyticsListener);
 
