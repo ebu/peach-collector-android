@@ -2,6 +2,10 @@
 # Change Log
 All notable changes to this project will be documented in this file.
 
+## [1.2.6] - 2024-05-08
+### Fixed
+- Crash on clearCurrentItem when tracker is not yet initialised
+
 ## [1.2.5] - 2024-04-12
 ### Updated
 - PlayerTracker heartbeat loop to avoid null pointers after clearing media
