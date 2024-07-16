@@ -492,7 +492,7 @@ public class Publisher {
                 Context appContext = PeachCollector.getApplicationContext();
 
                 long currentTimestamp = (new Date()).getTime();
-                long expiryTimestamp = (long) (currentTimestamp + (maxCacheHours*60*60));
+                long expiryTimestamp = (long) (currentTimestamp + (maxCacheHours*60*60*1000) + 10000);
                 SharedPreferences sPrefs= appContext.getSharedPreferences("PeachCollector", MODE_PRIVATE);
 
                 sPrefs.edit().putLong(remoteConfigurationURL + "_date", expiryTimestamp).apply();
