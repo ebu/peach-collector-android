@@ -2,6 +2,12 @@
 # Change Log
 All notable changes to this project will be documented in this file.
 
+## [1.2.7] - 2024-07-16
+### Fixed
+- Crash on stopHeartbeats when tracker is not keeping track of timers
+- Added check on device ID to avoid overwriting it when advertisingID is retrieved
+- Fix remote configuration expiration date computing
+
 ## [1.2.6] - 2024-05-08
 ### Fixed
 - Crash on clearCurrentItem when tracker is not yet initialised
