@@ -124,7 +124,7 @@ public class PeachCollector {
                     try {
                         AdvertisingIdClient.AdInfo adInfo = AdvertisingIdClient.getAdvertisingIdInfo(applicationContext);
                         limitedTrackingEnabled = adInfo.isLimitAdTrackingEnabled();
-                        if (!limitedTrackingEnabled) {
+                        if (!limitedTrackingEnabled && deviceID == null) {
                             deviceID = adInfo.getId();
                             if (deviceID == null) {
                                 SharedPreferences sPrefs = applicationContext.getSharedPreferences("PeachCollector", MODE_PRIVATE);

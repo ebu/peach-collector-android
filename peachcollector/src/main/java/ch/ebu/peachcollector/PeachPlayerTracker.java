@@ -170,13 +170,14 @@ public class PeachPlayerTracker {
                         mainHandler.post(myRunnable);
                     }
                 }, interval * 1000, interval * 1000);
-                publisherTimers.put(publisherName, timer);
+                sharedTracker.publisherTimers.put(publisherName, timer);
             }
         }
     }
 
     private void stopHeartbeats() {
         for (String publisherName: PeachCollector.sharedCollector.publishers.keySet()) {
+            if (sharedTracker.publisherTimers == null) return;
             Timer timer = sharedTracker.publisherTimers.get(publisherName);
             if (timer != null) {
                 timer.cancel();
