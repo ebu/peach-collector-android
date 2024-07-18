@@ -2,6 +2,11 @@
 # Change Log
 All notable changes to this project will be documented in this file.
 
+## [1.2.8] - 2024-07-18
+### Fixed
+- Timers not being stopped in the tracker if `trackMedia` is called multiple times without calling `clearCurrentItem`
+
+
 ## [1.2.7] - 2024-07-16
 ### Fixed
 - Crash on stopHeartbeats when tracker is not keeping track of timers
