@@ -105,6 +105,7 @@ public class PeachPlayerTracker {
                                   @Nullable EventProperties properties,
                                   @Nullable EventContext context,
                                   @Nullable Map<String, Object> metadata){
+        sharedTracker.stopHeartbeats();
         boolean isNewItem = sharedTracker.itemID == null || !mediaID.equals(sharedTracker.itemID);
         sharedTracker.itemID = mediaID;
         sharedTracker.props = properties;
