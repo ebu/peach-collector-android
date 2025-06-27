@@ -7,6 +7,7 @@ public class Constant {
     public static final String PEACH_LOG_NOTIFICATION_PAYLOAD = "Payload";
 
     public static final String SESSION_START_TIMESTAMP_SPREF_KEY = "PeachCollectorSessionStartTimestampKey";
+    public static final String SESSION_ID_SPREF_KEY = "PeachCollectorSessionIDKey";
     public static final String SESSION_LAST_ACTIVE_TIMESTAMP_SPREF_KEY = "PeachCollectorLastRecordedEventTimestampKey";
 
     public static final String PEACH_SCHEMA_VERSION_KEY = "peach_schema_version";
@@ -14,6 +15,7 @@ public class Constant {
     public static final String PEACH_IMPLEMENTATION_VERSION_KEY = "peach_implementation_version";
     public static final String SENT_TIMESTAMP_KEY = "sent_timestamp";
     public static final String SESSION_START_TIMESTAMP_KEY = "session_start_timestamp";
+    public static final String SESSION_ID_KEY = "session_id";
     public static final String USER_ID_KEY = "user_id";
 
 

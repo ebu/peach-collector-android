@@ -98,6 +98,11 @@ public class PeachCollector {
     public static long sessionStartTimestamp;
 
     /**
+     * Session ID
+     */
+    public static String sessionID;
+
+    /**
      * Maximum duration (in days) of storage for an event (should be changed before init)
      * Default is 30 days
      */
@@ -118,6 +123,7 @@ public class PeachCollector {
         applicationContext = application.getApplicationContext();
 
         sessionStartTimestamp = (new Date()).getTime();
+        sessionID = UUID.randomUUID().toString();
         if (deviceID == null) {
             new Thread(new Runnable() {
                 public void run() {
@@ -481,11 +487,17 @@ public class PeachCollector {
         long currentTimestamp = (new Date()).getTime();
         SharedPreferences sPrefs= applicationContext.getSharedPreferences("PeachCollector", MODE_PRIVATE);
         sessionStartTimestamp = sPrefs.getLong(SESSION_START_TIMESTAMP_SPREF_KEY, currentTimestamp);
+        sessionID = sPrefs.getString(SESSION_ID_SPREF_KEY, UUID.randomUUID().toString());
         long lastActiveTimestamp = sPrefs.getLong(SESSION_LAST_ACTIVE_TIMESTAMP_SPREF_KEY, currentTimestamp);
 
         if (currentTimestamp - lastActiveTimestamp > inactivityInterval) {
             sessionStartTimestamp = currentTimestamp;
-            sPrefs.edit().putLong(SESSION_START_TIMESTAMP_SPREF_KEY, sessionStartTimestamp).apply();
+            sessionID = UUID.randomUUID().toString();
+            sPrefs
+                    .edit()
+                    .putLong(SESSION_START_TIMESTAMP_SPREF_KEY, sessionStartTimestamp)
+                    .putString(SESSION_ID_SPREF_KEY, sessionID)
+                    .apply();
         }
         sPrefs.edit().putLong(SESSION_LAST_ACTIVE_TIMESTAMP_SPREF_KEY, currentTimestamp).apply();
     }

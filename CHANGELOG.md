@@ -2,10 +2,13 @@
 # Change Log
 All notable changes to this project will be documented in this file.
 
+## [1.3.0] - 2025-06-27
+### Added
+- `session_id` at the root of the payload (generated UUID), follows `session_start_timestamp` logic
+
 ## [1.2.8] - 2024-07-18
 ### Fixed
 - Timers not being stopped in the tracker if `trackMedia` is called multiple times without calling `clearCurrentItem`
-
 
 ## [1.2.7] - 2024-07-16
 ### Fixed
