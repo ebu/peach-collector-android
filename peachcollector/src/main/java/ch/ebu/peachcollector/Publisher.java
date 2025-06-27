@@ -360,6 +360,7 @@ public class Publisher {
             map.put(PEACH_IMPLEMENTATION_VERSION_KEY, PeachCollector.implementationVersion);
         }
         map.put(SESSION_START_TIMESTAMP_KEY, PeachCollector.sessionStartTimestamp);
+        map.put(SESSION_ID_KEY, PeachCollector.sessionID);
         map.put(SENT_TIMESTAMP_KEY, (new Date()).getTime());
         map.put(CLIENT_KEY, clientInfo());
 
