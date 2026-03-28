@@ -89,7 +89,7 @@ public class MediaPlayerService extends Service implements MediaPlayer.OnComplet
     private Notification.Action generateAction( int icon, String title, String intentAction ) {
         Intent intent = new Intent( getApplicationContext(), MediaPlayerService.class );
         intent.setAction( intentAction );
-        PendingIntent pendingIntent = PendingIntent.getService(getApplicationContext(), 1, intent, 0);
+        PendingIntent pendingIntent = PendingIntent.getService(getApplicationContext(), 1, intent, PendingIntent.FLAG_IMMUTABLE);
         return new Notification.Action.Builder( icon, title, pendingIntent ).build();
     }
 
@@ -98,7 +98,7 @@ public class MediaPlayerService extends Service implements MediaPlayer.OnComplet
 
         Intent intent = new Intent( getApplicationContext(), MediaPlayerService.class );
         intent.setAction( ACTION_STOP );
-        PendingIntent deleteIntent = PendingIntent.getService(getApplicationContext(), 1, intent, 0);
+        PendingIntent deleteIntent = PendingIntent.getService(getApplicationContext(), 1, intent, PendingIntent.FLAG_IMMUTABLE);
         Notification.Builder builder = new Notification.Builder( this )
                 .setSmallIcon(R.mipmap.ic_launcher)
                 .setContentTitle( "Media Title" )
