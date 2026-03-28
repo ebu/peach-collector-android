@@ -1,14 +1,13 @@
 package ch.ebu.peachcollector;
 
 import android.os.Handler;
+import android.os.Looper;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
-import com.google.android.exoplayer2.ExoPlayer;
-import com.google.android.exoplayer2.PlaybackParameters;
-import com.google.android.exoplayer2.Player;
-import com.google.android.exoplayer2.analytics.AnalyticsListener;
+import androidx.media3.common.PlaybackParameters;
+import androidx.media3.common.Player;
 
 import java.util.Date;
 import java.util.HashMap;
@@ -20,7 +19,7 @@ public class PeachPlayerTracker {
 
     private static volatile PeachPlayerTracker sharedTracker;
 
-    private ExoPlayer player;
+    private Player player;
     private String itemID;
     private EventContext context;
     private EventProperties props;
@@ -28,16 +27,16 @@ public class PeachPlayerTracker {
     private HashMap<String, Timer> publisherTimers;
     private Date trackingStartDate;
 
-    private AnalyticsListener analyticsListener = new AnalyticsListener() {
+    private Player.Listener playerListener = new Player.Listener() {
         @Override
-        public void onPlaybackStateChanged(AnalyticsListener.EventTime eventTime, @Player.State int state) {
+        public void onPlaybackStateChanged(@Player.State int state) {
             sharedTracker.updateTimeSpent();
-            if (state == 3 && sharedTracker.player.isPlaying()) { // playing
+            if (state == Player.STATE_READY && sharedTracker.player.isPlaying()) { // playing
                 sharedTracker.startHeartbeats();
                 sharedTracker.props.playbackPosition = sharedTracker.player.getCurrentPosition() / 1000;
                 Event.sendMediaPlay(sharedTracker.itemID, sharedTracker.props, sharedTracker.context, sharedTracker.metadata);
             }
-            else if (state == 4) { // reached the end
+            else if (state == Player.STATE_ENDED) { // reached the end
                 sharedTracker.stopHeartbeats();
                 sharedTracker.props.playbackPosition = sharedTracker.player.getCurrentPosition() / 1000;
                 Event.sendMediaEnd(sharedTracker.itemID, sharedTracker.props, sharedTracker.context, sharedTracker.metadata);
@@ -47,7 +46,7 @@ public class PeachPlayerTracker {
             }
         }
         @Override
-        public void onPlayWhenReadyChanged(AnalyticsListener.EventTime eventTime, boolean playWhenReady, @Player.PlayWhenReadyChangeReason int reason){
+        public void onPlayWhenReadyChanged(boolean playWhenReady, @Player.PlayWhenReadyChangeReason int reason){
             sharedTracker.updateTimeSpent();
             if (playWhenReady) { // playing
                 sharedTracker.startHeartbeats();
@@ -61,7 +60,7 @@ public class PeachPlayerTracker {
             }
         }
         @Override
-        public void onPositionDiscontinuity(AnalyticsListener.EventTime eventTime, Player.PositionInfo oldPosition, Player.PositionInfo newPosition, @Player.DiscontinuityReason int reason) {
+        public void onPositionDiscontinuity(Player.PositionInfo oldPosition, Player.PositionInfo newPosition, @Player.DiscontinuityReason int reason) {
             sharedTracker.updateTimeSpent();
             sharedTracker.props.playbackPosition = newPosition.positionMs / 1000;
             sharedTracker.props.previousPlaybackPosition = oldPosition.positionMs / 1000;
@@ -69,20 +68,21 @@ public class PeachPlayerTracker {
             sharedTracker.props.previousPlaybackPosition = null;
         }
         @Override
-        public void onVolumeChanged(AnalyticsListener.EventTime eventTime, float volume) {
+        public void onVolumeChanged(float volume) {
             sharedTracker.props.volume = volume;
         }
 
         @Override
-        public void onPlaybackParametersChanged(AnalyticsListener.EventTime eventTime, PlaybackParameters playbackParameters) {
+        public void onPlaybackParametersChanged(PlaybackParameters playbackParameters) {
             sharedTracker.props.playbackRate = playbackParameters.speed;
         }
     };
     /**
-     *  Initialize the player tracker. This will not trigger any events
+     *  Initialize the player tracker. This will not trigger any events.
+     *  Accepts any {@link Player} implementation (ExoPlayer, MediaController, etc.)
      *  @param player The player used in the application.
      */
-    public static void setPlayer(ExoPlayer player) {
+    public static void setPlayer(Player player) {
         if (sharedTracker == null) {
             sharedTracker = new PeachPlayerTracker();
         }
@@ -90,7 +90,7 @@ public class PeachPlayerTracker {
         sharedTracker.player = player;
 
         if (sharedTracker.itemID != null) {
-            sharedTracker.player.addAnalyticsListener(sharedTracker.analyticsListener);
+            sharedTracker.player.addListener(sharedTracker.playerListener);
         }
     }
 
@@ -124,7 +124,7 @@ public class PeachPlayerTracker {
         }
 
         if (sharedTracker.player != null) {
-            sharedTracker.player.addAnalyticsListener(sharedTracker.analyticsListener);
+            sharedTracker.player.addListener(sharedTracker.playerListener);
             if (sharedTracker.player.isPlaying()) {
                 sharedTracker.startHeartbeats();
             }
@@ -137,7 +137,9 @@ public class PeachPlayerTracker {
     public static void clearCurrentItem() {
         if (sharedTracker == null) { return; }
         sharedTracker.stopHeartbeats();
-        sharedTracker.player.removeAnalyticsListener(sharedTracker.analyticsListener);
+        if (sharedTracker.player != null) {
+            sharedTracker.player.removeListener(sharedTracker.playerListener);
+        }
 
         sharedTracker.itemID = null;
         sharedTracker.props = null;
@@ -158,7 +160,7 @@ public class PeachPlayerTracker {
                 timer.scheduleAtFixedRate(new TimerTask() {
                     @Override
                     public void run() {
-                        Handler mainHandler = new Handler(sharedTracker.player.getApplicationLooper());
+                        Handler mainHandler = new Handler(Looper.getMainLooper());
                         Runnable myRunnable = new Runnable() {
                             @Override
                             public void run() {
@@ -195,5 +197,3 @@ public class PeachPlayerTracker {
         sharedTracker.props.timeSpent = diff / 1000;
     }
 }
-
-

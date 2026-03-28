@@ -16,12 +16,10 @@ import android.widget.ImageButton;
 import android.widget.MediaController;
 import android.widget.VideoView;
 
-import com.google.android.exoplayer2.ExoPlayer;
-import com.google.android.exoplayer2.ForwardingPlayer;
-import com.google.android.exoplayer2.MediaItem;
-import com.google.android.exoplayer2.Player;
-import com.google.android.exoplayer2.analytics.AnalyticsListener;
-import com.google.android.exoplayer2.ui.StyledPlayerView;
+import androidx.media3.common.MediaItem;
+import androidx.media3.common.Player;
+import androidx.media3.exoplayer.ExoPlayer;
+import androidx.media3.ui.PlayerView;
 
 import ch.ebu.peachcollector.EventContextComponent;
 import ch.ebu.peachcollector.Event;
@@ -35,7 +33,7 @@ import ch.ebu.peachcollector.PeachPlayerTracker;
  */
 public class MediaFragment extends Fragment {
 
-    private StyledPlayerView videoView;
+    private PlayerView videoView;
 
     private EventContextComponent component = new EventContextComponent();
 

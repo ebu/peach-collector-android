@@ -2,6 +2,9 @@
 # Change Log
 All notable changes to this project will be documented in this file.
 
+## [2.0.0] - 2026-03-28
+### BREAKING CHANGE: PlayerTracker now works with Media3 ExoPlayer
+
 ## [1.3.0] - 2025-06-27
 ### Added
 - `session_id` at the root of the payload (generated UUID), follows `session_start_timestamp` logic
