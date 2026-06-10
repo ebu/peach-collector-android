@@ -2,6 +2,11 @@
 # Change Log
 All notable changes to this project will be documented in this file.
 
+## [1.3.1] - 2026-06-10
+### Fix
+`session_id` and `session_start_timestamp` are now properly saved on first launch
+It fixes the possible multiple sessions within the inactivity interval
+
 ## [1.3.0] - 2025-06-27
 ### Added
 - `session_id` at the root of the payload (generated UUID), follows `session_start_timestamp` logic
