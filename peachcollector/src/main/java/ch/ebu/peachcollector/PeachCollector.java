@@ -122,8 +122,10 @@ public class PeachCollector {
         application = app;
         applicationContext = application.getApplicationContext();
 
-        sessionStartTimestamp = (new Date()).getTime();
-        sessionID = UUID.randomUUID().toString();
+        // Load the persisted session and evaluate inactivity, matching iOS: a fresh session
+        // is minted and persisted on first launch, and restored on subsequent launches until
+        // the inactivity interval is exceeded.
+        checkInactivity();
         if (deviceID == null) {
             new Thread(new Runnable() {
                 public void run() {
@@ -488,7 +490,10 @@ public class PeachCollector {
         SharedPreferences sPrefs= applicationContext.getSharedPreferences("PeachCollector", MODE_PRIVATE);
         sessionStartTimestamp = sPrefs.getLong(SESSION_START_TIMESTAMP_SPREF_KEY, currentTimestamp);
         sessionID = sPrefs.getString(SESSION_ID_SPREF_KEY, UUID.randomUUID().toString());
-        long lastActiveTimestamp = sPrefs.getLong(SESSION_LAST_ACTIVE_TIMESTAMP_SPREF_KEY, currentTimestamp);
+        // Default to 0 (not currentTimestamp) so the very first launch is treated as
+        // inactive, forcing a reset that persists the session. Matches iOS, where the
+        // baseline (lastRecordedEventTimestamp) defaults to 0.
+        long lastActiveTimestamp = sPrefs.getLong(SESSION_LAST_ACTIVE_TIMESTAMP_SPREF_KEY, 0);
 
         if (currentTimestamp - lastActiveTimestamp > inactivityInterval) {
             sessionStartTimestamp = currentTimestamp;
